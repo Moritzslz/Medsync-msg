@@ -4,10 +4,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/api/v1/patients")
-public class PatientController {
+@RestController("/api/v1/doctors/")
+public class DoctorController {
 
-    public PatientController() {
+    public DoctorController() {
     }
 
     @PostMapping("/create")
