@@ -9,6 +9,14 @@ import lombok.Setter;
 
 import java.util.Date;
 
+/**
+ * Report entity representing a medical report in the application.
+ *
+ * @Summary Report Entity
+ * @Description Represents a medical report associated with a patient in the application.
+ * @Entity Report
+ * @Table name="reports"
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,6 +37,16 @@ public class Report {
     private Date date;
     private ReportType reportType;
 
+    /**
+     * Constructs a new Report with the specified details.
+     *
+     * @param patient the patient associated with the report
+     * @param diagnosis the diagnosis described in the report
+     * @param findings the findings described in the report
+     * @param recommendations the recommendations provided in the report
+     * @param date the date when the report was created
+     * @param reportType the type of the report
+     */
     public Report(Patient patient, String diagnosis, String findings, String recommendations, String date, ReportType reportType) {
         this.patient = patient;
         this.diagnosis = diagnosis;

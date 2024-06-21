@@ -6,6 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Doctor entity representing a doctor in the application.
+ *
+ * @Summary Doctor Entity
+ * @Description Represents a doctor in the application, extending the Person class.
+ * @Entity Doctor
+ * @Table name="doctors"
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +32,16 @@ public class Doctor extends Person {
     @JoinColumn(name = "patientId", referencedColumnName = "id")
     private Address address;
 
+    /**
+     * Constructs a new Doctor with the specified details.
+     *
+     * @param name the first name of the doctor
+     * @param surname the surname of the doctor
+     * @param specialty the medical specialty of the doctor
+     * @param email the email address of the doctor
+     * @param phone the phone number of the doctor
+     * @param address the address of the doctor
+     */
     public Doctor(String name, String surname, String specialty, String email, String phone, Address address) {
         this.name = name;
         this.surname = surname;

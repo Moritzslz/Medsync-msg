@@ -6,6 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Drug entity representing a drug in the application.
+ *
+ * @Summary Drug Entity
+ * @Description Represents a drug associated with a patient in the application.
+ * @Entity Drug
+ * @Table name="drugs"
+ */
 @Getter
 @Setter
 @NoArgsConstructor
