@@ -19,16 +19,13 @@ public class Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
-
     private String name;
     private String dosage;
     private String frequency;
     private Date startDate;
     private Date endDate;
-
     @OneToOne
     @JoinColumn(name = "prescribingDoctor", referencedColumnName = "id")
     private Doctor prescribingDoctor;

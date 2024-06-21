@@ -26,8 +26,7 @@ public class ICE {
     private String houseNumber;
     private String postalCode;
     private String city;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patientid", referencedColumnName = "id")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
 
     public ICE(Long id, String name, String surname, String relationship, String email, String phone, String street, String houseNumber, String postalCode, String city, Long patientId) {

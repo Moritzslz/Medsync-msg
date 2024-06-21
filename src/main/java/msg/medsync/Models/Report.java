@@ -19,8 +19,9 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JoinColumn(name = "patientId", referencedColumnName = "id")
+    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
+    @JoinColumn(name = "diagnosis", referencedColumnName = "id")
     private String diagnosis;
     private String findings;
     private String recommendations;

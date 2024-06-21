@@ -19,10 +19,8 @@ public class Allergy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
-
     private String allergen;
     private String reaction;
     private String severity;
