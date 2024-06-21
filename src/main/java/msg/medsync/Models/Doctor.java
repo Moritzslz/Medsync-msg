@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "doctors")
-public class Doctor extends Person {
+@Table(name = "doctor")
+public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,15 +21,21 @@ public class Doctor extends Person {
     private String specialty;
     private String email;
     private String phone;
-    @JoinColumn(name = "patientId", referencedColumnName = "id")
-    private Address address;
+    private String street;
+    private String houseNumber;
+    private String postalCode;
+    private String city;
 
-    public Doctor(String name, String surname, String specialty, String email, String phone, Address address) {
+    public Doctor(Long id, String name, String surname, String specialty, String email, String phone, String street, String houseNumber, String postalCode, String city) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.specialty = specialty;
         this.email = email;
         this.phone = phone;
-        this.address = address;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.postalCode = postalCode;
+        this.city = city;
     }
 }

@@ -22,7 +22,6 @@ public class Diagnosis {
 
     @JoinColumn(name = "patientId", referencedColumnName = "id")
     private Patient patient;
-
     private Doctor issuedBy;
     private String illness;
     private String description;
@@ -30,13 +29,14 @@ public class Diagnosis {
     private String dateDiagnosed;
     private ArrayList<Report> reports;
 
-    public Diagnosis(Patient patient, Doctor issuedBy, String illness, String description, String severity, String dateDiagnosed) {
+    public Diagnosis(Long id, Patient patient, Doctor issuedBy, String illness, String description, String severity, String dateDiagnosed, ArrayList<Report> reports) {
+        this.id = id;
         this.patient = patient;
         this.issuedBy = issuedBy;
         this.illness = illness;
         this.description = description;
         this.severity = severity;
         this.dateDiagnosed = dateDiagnosed;
-        this.reports = new ArrayList<>();
+        this.reports = reports;
     }
 }

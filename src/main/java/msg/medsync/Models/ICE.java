@@ -17,25 +17,30 @@ public class ICE {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patientId", referencedColumnName = "id")
-    private Patient patient;
-
     private String name;
     private String surname;
     private String relationship;
     private String email;
     private String phone;
-    @JoinColumn(name = "patientId", referencedColumnName = "id")
-    private Address address;
+    private String street;
+    private String houseNumber;
+    private String postalCode;
+    private String city;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patientid", referencedColumnName = "id")
+    private Long patientId;
 
-    public ICE(String name, String surname, String relationship, String email, String phone, Address address) {
+    public ICE(Long id, String name, String surname, String relationship, String email, String phone, String street, String houseNumber, String postalCode, String city, Long patientId) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.relationship = relationship;
         this.email = email;
         this.phone = phone;
-        this.address = address;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.patientId = patientId;
     }
 }
