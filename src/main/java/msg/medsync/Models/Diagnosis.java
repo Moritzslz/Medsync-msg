@@ -20,23 +20,22 @@ public class Diagnosis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "patientId", referencedColumnName = "id")
-    private Patient patient;
-    private Doctor issuedBy;
+    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    private Long patientId;
+    @JoinColumn(name = "issuedBy", referencedColumnName = "id")
+    private Long issuedBy;
     private String illness;
     private String description;
     private String severity;
     private String dateDiagnosed;
-    private ArrayList<Report> reports;
 
-    public Diagnosis(Long id, Patient patient, Doctor issuedBy, String illness, String description, String severity, String dateDiagnosed, ArrayList<Report> reports) {
+    public Diagnosis(Long id, Long patientId, Long issuedBy, String illness, String description, String severity, String dateDiagnosed) {
         this.id = id;
-        this.patient = patient;
+        this.patientId = patientId;
         this.issuedBy = issuedBy;
         this.illness = illness;
         this.description = description;
         this.severity = severity;
         this.dateDiagnosed = dateDiagnosed;
-        this.reports = reports;
     }
 }
