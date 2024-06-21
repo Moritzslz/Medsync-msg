@@ -1,0 +1,43 @@
+{
+  "KVR": "",
+  "healthInsuranceProvider": "",
+  "name": "",
+  "surname": "",
+  "birthday": "",
+  "weight": "",
+  "height": "",
+  "email": "",
+  "phone": "",
+  "address": {
+    "street": "",
+    "houseNumber": "",
+    "postalCode": "",
+    "city": ""
+  },
+  "ICE": {
+    "name": "",
+    "surname": "",
+    "relationship": "",
+    "email": "",
+    "phone": "",
+    "address": {
+      "street": "",
+      "houseNumber": "",
+      "postalCode": "",
+      "city": ""
+    }
+  },
+  "familyDoctor": {
+    "id": "",
+    "name": "",
+    "surname": "",
+    "email": "",
+    "phone": "",
+    "address": {
+      "street": "",
+      "houseNumber": "",
+      "postalCode": "",
+      "city": ""
+    }
+  }
+}

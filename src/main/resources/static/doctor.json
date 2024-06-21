@@ -1,0 +1,13 @@
+{
+  "id": "",
+  "name": "",
+  "surname": "",
+  "email": "",
+  "phone": "",
+  "address": {
+    "street": "",
+    "houseNumber": "",
+    "postalCode": "",
+    "city": ""
+  }
+}
