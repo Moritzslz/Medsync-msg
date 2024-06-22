@@ -26,9 +26,9 @@ public class Report {
     private String findings;
     private String recommendations;
     private Date date;
-    private ReportType reportType;
+    private String reportType;
 
-    public Report(Long patientId, String diagnosisId, String findings, String recommendations, Date date, ReportType reportType) {
+    public Report(Long patientId, String diagnosisId, String findings, String recommendations, Date date, String reportType) {
         this.patientId = patientId;
         this.diagnosisId = diagnosisId;
         this.findings = findings;

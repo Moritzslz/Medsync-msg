@@ -1,5 +1,6 @@
 package msg.medsync.Services;
 
+import msg.medsync.Models.Allergen;
 import msg.medsync.Models.HealthInsuranceProvider;
 import msg.medsync.Models.ReportType;
 import msg.medsync.Models.Severity;
@@ -29,8 +30,8 @@ public class UtilService {
         };
     }
 
-    public static HealthInsuranceProvider getHealthInsuranceProvider(String provider) {
-        return switch (provider.toLowerCase().trim()) {
+    public static HealthInsuranceProvider getHealthInsuranceProvider(String hip) {
+        return switch (hip.toLowerCase().trim()) {
             case "aok" -> HealthInsuranceProvider.AOK;
             case "tk" -> HealthInsuranceProvider.TK;
             case "bkk" -> HealthInsuranceProvider.BKK;
@@ -47,7 +48,28 @@ public class UtilService {
             case "pronova bkk" -> HealthInsuranceProvider.PRONOVA_BKK;
             case "mercer" -> HealthInsuranceProvider.MERCER;
             case "allianz" -> HealthInsuranceProvider.ALLIANZ;
-            default -> throw new IllegalArgumentException("Unknown health insurance provider: " + provider);
+            default -> throw new IllegalArgumentException("Unknown health insurance provider: " + hip);
+        };
+    }
+
+    public static Allergen getAllergene(String allergen) {
+        return switch (allergen.toLowerCase().trim()) {
+            case "pollen" -> Allergen.POLLEN;
+            case "dust" -> Allergen.DUST;
+            case "pet dander" -> Allergen.PET_DANDER;
+            case "peanuts" -> Allergen.PEANUTS;
+            case "shellfish" -> Allergen.SHELLFISH;
+            case "milk" -> Allergen.MILK;
+            case "egg" -> Allergen.EGG;
+            case "penicillin" -> Allergen.PENICILLIN;
+            case "latex" -> Allergen.LATEX;
+            case "insect stings" -> Allergen.INSECT_STINGS;
+            case "mold" -> Allergen.MOLD;
+            case "soy" -> Allergen.SOY;
+            case "wheat" -> Allergen.WHEAT;
+            case "fish" -> Allergen.FISH;
+            case "other" -> Allergen.OTHER;
+            default -> throw new IllegalArgumentException("Unknown allergen: " + allergen);
         };
     }
 
