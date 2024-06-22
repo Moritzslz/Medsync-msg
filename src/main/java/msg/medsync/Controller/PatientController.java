@@ -145,11 +145,41 @@ public class PatientController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePatient(@PathVariable long id) {
+        if(!patientRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            patientRepository.deleteById(id);
+            return ResponseEntity.ok().body("Patient deleted");
+        }
+    }
+
     /*
     ============================================================================
     EMERGENCY CONTACT
     ============================================================================
     */
+
+    @GetMapping("/{id}/ice")
+    public ResponseEntity<ICE> getICEById(@PathVariable long id) {
+        Optional<ICE> ice = iceRepository.findByPatientId(id);
+        if (ice.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(ice.get());
+        }
+    }
+
+    @DeleteMapping("/{id}/ice")
+    public ResponseEntity<String> deleteIce(@PathVariable long id) {
+        if(!iceRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            iceRepository.deleteById(id);
+            return ResponseEntity.ok().body("Emergency contact deleted");
+        }
+    }
 
     @PutMapping("/{id}/ice")
     public ResponseEntity<ICE> updateICE(@RequestBody ICE ice, @PathVariable long id) {
@@ -183,28 +213,6 @@ public class PatientController {
         return ResponseEntity.ok().body(existingICE);
     }
 
-    @GetMapping("/{id}/ice")
-    public ResponseEntity<ICE> getICEById(@PathVariable long id) {
-        Optional<ICE> ice = iceRepository.findByPatientId(id);
-        if (ice.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok().body(ice.get());
-        }
-    }
-
-    @DeleteMapping("/{id}/ice/delete")
-    public ResponseEntity<String> deleteIce(@PathVariable long id) {
-        if(!iceRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        } else {
-            iceRepository.deleteById(id);
-            return ResponseEntity.ok().body("Emergency contact deleted");
-        }
-    }
-
-    // TODO @PutMapping
-
     /*
     ============================================================================
     Allergy
@@ -226,6 +234,27 @@ public class PatientController {
         allergyRepository.save(allergy);
         return ResponseEntity.ok().body(allergy);
     }
+
+    @GetMapping("/{id}/allergy/all")
+    public ResponseEntity<Iterable<Allergy>> findAllAllergiesById(@PathVariable long id) {
+        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
+        if (!allergies.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(allergies);
+        }
+    }
+
+    @DeleteMapping("/{id}/allergy")
+    public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
+        if(!allergyRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            allergyRepository.deleteById(id);
+            return ResponseEntity.ok().body("Allergy deleted");
+        }
+    }
+
     @PutMapping("{id}/allergy")
     public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
         ResponseEntity validated = validateId(id, allergy.getPatientId());
@@ -259,28 +288,6 @@ public class PatientController {
         return ResponseEntity.ok().body(existingAllergy);
     }
 
-    @GetMapping("/{id}/allergy/all")
-    public ResponseEntity<Iterable<Allergy>> findAllAllergiesById(@PathVariable long id) {
-        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
-        if (!allergies.iterator().hasNext()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok().body(allergies);
-        }
-    }
-
-    @DeleteMapping("/{id}/allergy")
-    public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
-        if(!allergyRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        } else {
-            allergyRepository.deleteById(id);
-            return ResponseEntity.ok().body("Allergy deleted");
-        }
-    }
-
-    // TODO @PutMapping
-
     /*
     ============================================================================
     Vaccination
@@ -309,7 +316,7 @@ public class PatientController {
         }
     }
 
-    @DeleteMapping("/{id}/vaccination/")
+    @DeleteMapping("/{id}/vaccination")
     public ResponseEntity<String> deleteVaccination(@PathVariable long id) {
         if(!vaccinationRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -344,7 +351,7 @@ public class PatientController {
 
     // TODO @GetMapping
 
-    @DeleteMapping("/{id}/diagnosis/delete")
+    @DeleteMapping("/{id}/diagnosis")
     public ResponseEntity<String> deleteDiagnosis(@PathVariable long id) {
         if(!diagnosisRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -443,7 +450,7 @@ public class PatientController {
 
     // TODO @GetMapping
 
-    @DeleteMapping("/{id}/drug/delete")
+    @DeleteMapping("/{id}/drug")
     public ResponseEntity<String> deleteDrug(@PathVariable long id) {
         if(!drugRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
