@@ -63,19 +63,22 @@ public class DoctorController {
         }
     }
 
-    @DeleteMapping("/{id}/patient/{patientid}")
-    public ResponseEntity<String> deletePatientDoctor(@PathVariable long id, @PathVariable long patiendId) {
-        if(!)
-    }
-    @DeleteMapping("{id}/patient/{patientid}")
+    @DeleteMapping("{id}/patient/{patientId}")
     public ResponseEntity<String> deletePatientDoctor(@PathVariable Long id, @PathVariable Long patientId) {
-    Optional<PatientDoctor> patientDoctor = patientDoctorRepository.findByPatientIdAndDoctorId(patientId, id);
-    if (patientDoctor.isEmpty()) {
-        return ResponseEntity.notFound().build();
-    } else {
-        patientDoctorRepository.delete(patientDoctor.get());
-        return ResponseEntity.noContent().build();
+        List<PatientDoctor> patients = patientDoctorRepository.findByPatientId(patientId);
+        if (patients.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Optional<PatientDoctor> patientDoctors = patients.stream()
+                .filter(pd -> pd.getDoctorId().equals(id))
+                .findFirst();
+            
+            if (patientDoctors.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            } else {
+                patientDoctorRepository.delete(patientDoctors.get());
+                return ResponseEntity.ok().body("Patient deleted from doctor");
+            }
+        }
     }
-}
-
 }
