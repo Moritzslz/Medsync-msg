@@ -2,7 +2,6 @@ package msg.medsync.Controller;
 
 import msg.medsync.Models.*;
 import msg.medsync.Repositories.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,9 +14,6 @@ import static msg.medsync.Services.UtilService.getSeverity;
 @RestController
 @RequestMapping( "/api/v1/patient")
 public class PatientController {
-    
-    @Autowired
-    public final PatientRepository patientRepository;
 
     private final PatientRepository patientRepository;
     private final AllergyRepository allergyRepository;
