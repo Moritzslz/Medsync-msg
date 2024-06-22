@@ -55,29 +55,29 @@ public class PatientController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patientDetails) {
+    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
         Optional<Patient> optionalPatient = patientRepository.findById(id);
 
-        if (!optionalPatient.isPresent()) {
+        if (optionalPatient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         Patient existingPatient = optionalPatient.get();
-        existingPatient.setICE(patientDetails.getICE());
-        existingPatient.setFamilyDoctor(patientDetails.getFamilyDoctor());
-        existingPatient.setKVR(patientDetails.getKVR());
-        existingPatient.setHealthInsuranceProvider(patientDetails.getHealthInsuranceProvider());
-        existingPatient.setName(patientDetails.getName());
-        existingPatient.setSurname(patientDetails.getSurname());
-        existingPatient.setBirthday(patientDetails.getBirthday());
-        existingPatient.setWeightKg(patientDetails.getWeightKg());
-        existingPatient.setHeightCm(patientDetails.getHeightCm());
-        existingPatient.setEmail(patientDetails.getEmail());
-        existingPatient.setPhone(patientDetails.getPhone());
-        existingPatient.setStreet(patientDetails.getStreet());
-        existingPatient.setHouseNumber(patientDetails.getHouseNumber());
-        existingPatient.setPostalCode(patientDetails.getPostalCode());
-        existingPatient.setCity(patientDetails.getCity());
+        existingPatient.setICE(patient.getICE());
+        existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
+        existingPatient.setKVR(patient.getKVR());
+        existingPatient.setHealthInsuranceProvider(patient.getHealthInsuranceProvider());
+        existingPatient.setName(patient.getName());
+        existingPatient.setSurname(patient.getSurname());
+        existingPatient.setBirthday(patient.getBirthday());
+        existingPatient.setWeightKg(patient.getWeightKg());
+        existingPatient.setHeightCm(patient.getHeightCm());
+        existingPatient.setEmail(patient.getEmail());
+        existingPatient.setPhone(patient.getPhone());
+        existingPatient.setStreet(patient.getStreet());
+        existingPatient.setHouseNumber(patient.getHouseNumber());
+        existingPatient.setPostalCode(patient.getPostalCode());
+        existingPatient.setCity(patient.getCity());
 
 
         patientRepository.save(existingPatient);
@@ -152,16 +152,16 @@ public class PatientController {
     */
 
     @PutMapping("/{id}/ice")
-    public ResponseEntity<ICE> updateICE(@RequestBody ICE iceDetails, @PathVariable long id) {
+    public ResponseEntity<ICE> updateICE(@RequestBody ICE ice, @PathVariable long id) {
 
-        ResponseEntity validated = validateId(id, iceDetails.getPatientId());
+        ResponseEntity validated = validateId(id, ice.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
         Optional<Patient> optionalPatient = patientRepository.findById(id);
 
-        if (!optionalPatient.isPresent()) {
+        if (optionalPatient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -171,13 +171,13 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        existingICE.setName(iceDetails.getName());
-        existingICE.setSurname(iceDetails.getSurname());
-        existingICE.setCity(iceDetails.getCity());
-        existingICE.setPhone(iceDetails.getPhone());
-        existingICE.setStreet(iceDetails.getStreet());
-        existingICE.setPostalCode(iceDetails.getPostalCode());
-        existingICE.setRelationship(iceDetails.getRelationship());
+        existingICE.setName(ice.getName());
+        existingICE.setSurname(ice.getSurname());
+        existingICE.setCity(ice.getCity());
+        existingICE.setPhone(ice.getPhone());
+        existingICE.setStreet(ice.getStreet());
+        existingICE.setPostalCode(ice.getPostalCode());
+        existingICE.setRelationship(ice.getRelationship());
 
         iceRepository.save(existingICE);
         return ResponseEntity.ok().body(existingICE);
@@ -227,19 +227,19 @@ public class PatientController {
         return ResponseEntity.ok().body(allergy);
     }
     @PutMapping("{id}/allergy")
-    public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergyDetails, @PathVariable long id, String severity) {
-        ResponseEntity validated = validateId(id, allergyDetails.getPatientId());
+    public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, allergy.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
         Optional<Patient> optionalPatient = patientRepository.findById(id);
-        if (!optionalPatient.isPresent()) {
+        if (optionalPatient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Optional<Allergy> optionalAllergy = allergyRepository.findById(allergyDetails.getId());
-        if (!optionalAllergy.isPresent()) {
+        Optional<Allergy> optionalAllergy = allergyRepository.findById(allergy.getId());
+        if (optionalAllergy.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -248,12 +248,12 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Severity severityEnum = getSeverity(severity);
-        existingAllergy.setSeverity(severityEnum);
-        existingAllergy.setAllergen(allergyDetails.getAllergen());
-        existingAllergy.setReaction(allergyDetails.getReaction());
-        existingAllergy.setNotes(allergyDetails.getNotes());
-        existingAllergy.setDateDiagnosed(allergyDetails.getDateDiagnosed());
+        Severity severity = getSeverity(allergy.getSeverity());
+        existingAllergy.setSeverity(severity.name());
+        existingAllergy.setAllergen(allergy.getAllergen());
+        existingAllergy.setReaction(allergy.getReaction());
+        existingAllergy.setNotes(allergy.getNotes());
+        existingAllergy.setDateDiagnosed(allergy.getDateDiagnosed());
 
         allergyRepository.save(existingAllergy);
         return ResponseEntity.ok().body(existingAllergy);
@@ -356,19 +356,19 @@ public class PatientController {
 
 
     @PutMapping("/{id}/diagnosis")
-    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosisDetails, @PathVariable long id, @RequestParam String severity) {
-        ResponseEntity validated = validateId(id, diagnosisDetails.getPatientId());
+    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id, @RequestParam String severity) {
+        ResponseEntity validated = validateId(id, diagnosis.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
         Optional<Patient> optionalPatient = patientRepository.findById(id);
-        if (!optionalPatient.isPresent()) {
+        if (optionalPatient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Optional<Diagnosis> optionalDiagnosis = diagnosisRepository.findById(diagnosisDetails.getId());
-        if (!optionalDiagnosis.isPresent()) {
+        Optional<Diagnosis> optionalDiagnosis = diagnosisRepository.findById(diagnosis.getId());
+        if (optionalDiagnosis.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -379,10 +379,10 @@ public class PatientController {
 
         Severity severityEnum = getSeverity(severity);
         existingDiagnosis.setSeverity(severityEnum);
-        existingDiagnosis.setDescription(diagnosisDetails.getDescription());
-        existingDiagnosis.setIllness(diagnosisDetails.getIllness());
-        existingDiagnosis.setIssuedBy(diagnosisDetails.getIssuedBy());
-        existingDiagnosis.setDateDiagnosed(diagnosisDetails.getDateDiagnosed());
+        existingDiagnosis.setDescription(diagnosis.getDescription());
+        existingDiagnosis.setIllness(diagnosis.getIllness());
+        existingDiagnosis.setIssuedBy(diagnosis.getIssuedBy());
+        existingDiagnosis.setDateDiagnosed(diagnosis.getDateDiagnosed());
 
         diagnosisRepository.save(existingDiagnosis);
         return ResponseEntity.ok().body(existingDiagnosis);
