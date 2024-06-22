@@ -92,36 +92,6 @@ public class PatientController {
         }
     }
 
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
-        Optional<Patient> optionalPatient = patientRepository.findById(id);
-
-        if (optionalPatient.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Patient existingPatient = optionalPatient.get();
-        existingPatient.setIce(patient.getIce());
-        existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
-        existingPatient.setKvr(patient.getKvr());
-        existingPatient.setHip(patient.getHip());
-        existingPatient.setName(patient.getName());
-        existingPatient.setSurname(patient.getSurname());
-        existingPatient.setBirthday(patient.getBirthday());
-        existingPatient.setWeightKg(patient.getWeightKg());
-        existingPatient.setHeightCm(patient.getHeightCm());
-        existingPatient.setEmail(patient.getEmail());
-        existingPatient.setPhone(patient.getPhone());
-        existingPatient.setStreet(patient.getStreet());
-        existingPatient.setHouseNumber(patient.getHouseNumber());
-        existingPatient.setHouseNumber(patient.getHouseNumber());
-        existingPatient.setCity(patient.getCity());
-
-        patientRepository.save(existingPatient);
-        return ResponseEntity.ok().body(existingPatient);
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<Patient>> getAllPatients() {
         List<Patient> patients = (List<Patient>) patientRepository.findAll();
@@ -207,10 +177,10 @@ public class PatientController {
         }
 
         Patient existingPatient = optionalPatient.get();
-        existingPatient.setICE(patient.getICE());
+        existingPatient.setIce(patient.getIce());
         existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
-        existingPatient.setKVR(patient.getKVR());
-        existingPatient.setHealthInsuranceProvider(patient.getHealthInsuranceProvider());
+        existingPatient.setKvr(patient.getKvr());
+        existingPatient.setHip(patient.getHip());
         existingPatient.setName(patient.getName());
         existingPatient.setSurname(patient.getSurname());
         existingPatient.setBirthday(patient.getBirthday());
@@ -327,9 +297,13 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}/allergy/all")
-    public ResponseEntity<Iterable<Allergy>> deleteAllAllergiesByPatientId(@PathVariable long id) {
-        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
-        if (!allergies.iterator().hasNext()) {
+    public ResponseEntity<String> deleteAllAllergiesByPatientId(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Allergy> allergies = (List<Allergy>) allergyRepository.findAllByPatient(patient.get());
+        if (allergies.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             allergyRepository.deleteAll(allergies);
@@ -341,7 +315,7 @@ public class PatientController {
     public ResponseEntity<String> deleteAllergyById(@PathVariable long id, @PathVariable long allergyId) {
         Optional<Allergy> allergy = allergyRepository.findById(allergyId);
         
-        if (allergy.isEmpty() || !allergy.get().getPatientId().equals(id)) {
+        if (allergy.isEmpty() || !allergy.get().getId().equals(id)) {
             return ResponseEntity.notFound().build();
         } else {
             allergyRepository.deleteById(allergyId);
@@ -416,8 +390,12 @@ public class PatientController {
 
     @DeleteMapping("/{id}/vaccination")
     public ResponseEntity<String> deleteAllVaccinationsByPatientId(@PathVariable long id) {
-        Iterable<Vaccination> vaccinations = vaccinationRepository.findAllByPatientId(id);
-        if (!vaccinations.iterator().hasNext()) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Vaccination> vaccinations = (List<Vaccination>) vaccinationRepository.findAllByPatient(patient.get());
+        if (vaccinations.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             vaccinationRepository.deleteAll(vaccinations);
@@ -430,7 +408,7 @@ public class PatientController {
     public ResponseEntity<String> deleteVaccinationById(@PathVariable long id, @PathVariable long vaccinationId) {
         Optional<Vaccination> vaccination = vaccinationRepository.findById(vaccinationId);
         
-        if (vaccination.isEmpty() || !vaccination.get().getPatientId().equals(id)) {
+        if (vaccination.isEmpty() || !vaccination.get().getId().equals(id)) {
             return ResponseEntity.notFound().build();
         } else {
             vaccinationRepository.deleteById(vaccinationId);
@@ -507,8 +485,12 @@ public class PatientController {
 
     @DeleteMapping("/{id}/diagnosis")
     public ResponseEntity<String> deleteAllDiagnosesByPatientId(@PathVariable long id) {
-        Iterable<Diagnosis> diagnoses = diagnosisRepository.findAllByPatientId(id);
-        if (!diagnoses.iterator().hasNext()) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Diagnosis> diagnoses = (List<Diagnosis>) diagnosisRepository.findAllByPatient(patient.get());
+        if (diagnoses.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             diagnosisRepository.deleteAll(diagnoses);
@@ -520,7 +502,7 @@ public class PatientController {
     public ResponseEntity<String> deleteDiagnosisById(@PathVariable long id, @PathVariable long diagnosisId) {
         Optional<Diagnosis> diagnosis = diagnosisRepository.findById(diagnosisId);
         
-        if (diagnosis.isEmpty() || !diagnosis.get().getPatientId().equals(id)) {
+        if (diagnosis.isEmpty() || !diagnosis.get().getId().equals(id)) {
             return ResponseEntity.notFound().build();
         } else {
             diagnosisRepository.deleteById(diagnosisId);
@@ -598,7 +580,11 @@ public class PatientController {
 
     @DeleteMapping("/{id}/report")
     public ResponseEntity<String> deleteAllReportsByPatientId(@PathVariable long id) {
-        Iterable<Report> reports = reportRepository.findAllByPatientId(id);
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Report> reports = (List<Report>) reportRepository.findAllByPatient(patient.get());
         if (!reports.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -610,7 +596,7 @@ public class PatientController {
     @DeleteMapping("/{id}/report/{reportId}")
     public ResponseEntity<String> deleteReportById(@PathVariable long id, @PathVariable long reportId) {
         Optional<Report> report = reportRepository.findById(reportId);
-        if (report.isEmpty() || !report.get().getPatientId().equals(id)) {
+        if (report.isEmpty() || !report.get().getId().equals(id)) {
             return ResponseEntity.notFound().build();
         } else {
             reportRepository.deleteById(reportId);

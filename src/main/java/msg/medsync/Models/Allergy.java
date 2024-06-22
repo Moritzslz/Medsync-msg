@@ -20,7 +20,6 @@ public class Allergy {
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
-
     private String allergen;
     private String reaction;
     private String severity;
