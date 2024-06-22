@@ -146,12 +146,16 @@ public class DoctorController {
 
     @DeleteMapping("{id}/patient/{patientId}")
     public ResponseEntity<String> deletePatientDoctor(@PathVariable Long id, @PathVariable Long patientId) {
-        List<PatientDoctor> patients = patientDoctorRepository.findByPatientId(patientId);
+        Optional<Patient> patient = patientRepository.findById(patientId);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<PatientDoctor> patients = (List<PatientDoctor>) patientDoctorRepository.findAllByPatient(patient.get());
         if (patients.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             Optional<PatientDoctor> patientDoctors = patients.stream()
-                .filter(pd -> pd.getDoctorId().equals(id))
+                .filter(pd -> pd.getDoctor().getDoctorId().equals(id))
                 .findFirst();
             
             if (patientDoctors.isEmpty()) {
