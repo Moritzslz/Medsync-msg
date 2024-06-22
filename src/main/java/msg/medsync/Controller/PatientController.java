@@ -15,7 +15,9 @@ import static msg.medsync.Services.UtilService.getSeverity;
 @RestController
 @RequestMapping( "/api/v1/patient")
 public class PatientController {
-
+    
+    @Autowired
+    public final PatientRepository patientRepository;
 
     private final PatientRepository patientRepository;
     private final AllergyRepository allergyRepository;
@@ -120,5 +122,4 @@ public class PatientController {
     // TODO @GetMapping
     // TODO @DeleteMapping
     // TODO @PutMapping
-
 }
