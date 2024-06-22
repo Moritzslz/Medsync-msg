@@ -8,8 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface PatientRepository extends CrudRepository<Patient, Long> {
-    Optional<Patient> findByPatientId(Long patientId);
     Optional<Patient> findByEmail(String email);
-    Optional<Patient> findByNameAndSurname(String name, String surname);
+    Iterable<Patient> findAllByNameAndSurname(String name, String surname);
+    Iterable<Patient> findAllBySurname(String surname);
+    Iterable<Patient> findAllByKVR(String KVR);
     Optional<Patient> findByKVRAndHealthInsuranceProvider(String KVR, String healthInsuranceProvider);
 }

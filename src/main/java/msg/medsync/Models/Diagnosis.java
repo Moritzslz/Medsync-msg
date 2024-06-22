@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -19,18 +20,17 @@ public class Diagnosis {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
-    @JoinColumn(name = "issuedBy", referencedColumnName = "id")
-    private Long issuedBy;
+    @OneToOne
+    @JoinColumn(name = "issuedBy", referencedColumnName = "doctorId")
+    private Doctor issuedBy;
     private String illness;
     private String description;
-    private String severity;
-    private String dateDiagnosed;
+    private Severity severity;
+    private Date dateDiagnosed;
 
-    public Diagnosis(Long id, Long patientId, Long issuedBy, String illness, String description, String severity, String dateDiagnosed) {
-        this.id = id;
+    public Diagnosis(Long patientId, Doctor issuedBy, String illness, String description, Severity severity, Date dateDiagnosed) {
         this.patientId = patientId;
         this.issuedBy = issuedBy;
         this.illness = illness;

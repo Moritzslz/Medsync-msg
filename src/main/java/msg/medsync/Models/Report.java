@@ -1,6 +1,5 @@
 package msg.medsync.Models;
 
-
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,24 +13,24 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "reports")
+@Table(name = "report")
 public class Report {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
-    @JoinColumn(name = "diagnosis", referencedColumnName = "id")
-    private String diagnosis;
+    @JoinColumn(name = "diagnosisId", referencedColumnName = "id")
+    private String diagnosisId;
     private String findings;
     private String recommendations;
     private Date date;
     private ReportType reportType;
 
-    public Report(Long id, Long patientId, String diagnosis, String findings, String recommendations, Date date, ReportType reportType) {
-        this.id = id;
+    public Report(Long patientId, String diagnosisId, String findings, String recommendations, Date date, ReportType reportType) {
         this.patientId = patientId;
-        this.diagnosis = diagnosis;
+        this.diagnosisId = diagnosisId;
         this.findings = findings;
         this.recommendations = recommendations;
         this.date = date;

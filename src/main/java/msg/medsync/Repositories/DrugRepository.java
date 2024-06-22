@@ -5,11 +5,13 @@ import msg.medsync.Models.Drug;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.Date;
 
 @Repository
 public interface DrugRepository extends CrudRepository<Drug, Long> {
-    Optional<Drug> findByPatientId(Long patientId);
-    Optional<Drug> findByPrescribingDoctor(Doctor doctor);
+    Iterable<Drug> findAllByPatientId(Long patientId);
+    Iterable<Drug> findAllByPrescribingDoctor(Doctor doctor);
+    Iterable<Drug> findAllByName(String name);
+    Iterable<Drug> findAllByStartDateOrderByStartDateDesc(Date startDate);
+    Iterable<Drug> findAllByEndDateOrderByEndDateDesc(Date endDate);
 }
