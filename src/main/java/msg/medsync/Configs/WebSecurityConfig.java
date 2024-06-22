@@ -36,10 +36,7 @@ public class WebSecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:8080",
-                "https://medsync-msg-dcbbac5e8a38.herokuapp.com/")
-        );
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedHeaders(List.of(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,
