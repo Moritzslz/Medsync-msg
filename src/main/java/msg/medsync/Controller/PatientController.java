@@ -212,15 +212,17 @@ public class PatientController {
     */
 
     @PostMapping("/{id}/allergy")
-    public ResponseEntity<Allergy> addAllergy(@RequestBody Allergy allergy, String severity, @PathVariable long id) {
+    public ResponseEntity<Allergy> addAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
         // TODO validations
         ResponseEntity validated = validateId(id, allergy.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
-        Severity severityEnum = getSeverity(severity);
-        allergy.setSeverity(severityEnum);
+        Allergen allergen =  getAllergene(allergy.getAllergen());
+        Severity severity = getSeverity(allergy.getSeverity());
+        allergy.setSeverity(allergen.name());
+        allergy.setSeverity(severity.name());
         allergyRepository.save(allergy);
         return ResponseEntity.ok().body(allergy);
     }
@@ -297,7 +299,15 @@ public class PatientController {
         return ResponseEntity.ok().body(vaccination);
     }
 
-    // TODO @GetMapping
+    @GetMapping("{id}/vaccination")
+    public ResponseEntity<Iterable<Vaccination>> getVaccinationById(@PathVariable long id) {
+        Iterable<Vaccination> vaccinations = vaccinationRepository.findAllByPatientId(id);
+        if (!vaccinations.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(vaccinations);
+        }
+    }
 
     @DeleteMapping("/{id}/vaccination/")
     public ResponseEntity<String> deleteVaccination(@PathVariable long id) {
@@ -355,15 +365,15 @@ public class PatientController {
     */
 
     @PostMapping("/{id}/report")
-    public ResponseEntity<Report> addReport(@RequestBody Report report, String type, @PathVariable long id) {
+    public ResponseEntity<Report> addReport(@RequestBody Report report, @PathVariable long id) {
         // TODO validations
         ResponseEntity validated = validateId(id, report.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
-        ReportType reportType = getReportType(type);
-        report.setReportType(reportType);
+        ReportType reportType = getReportType(report.getReportType());
+        report.setReportType(reportType.name());
         reportRepository.save(report);
         return ResponseEntity.ok().body(report);
     }
