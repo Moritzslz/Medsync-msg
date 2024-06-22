@@ -51,6 +51,37 @@ public class PatientController {
         return ResponseEntity.ok().body(patient);
     }
 
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patientDetails) {
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+
+        if (!optionalPatient.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Patient existingPatient = optionalPatient.get();
+        existingPatient.setICE(patientDetails.getICE());
+        existingPatient.setFamilyDoctor(patientDetails.getFamilyDoctor());
+        existingPatient.setKVR(patientDetails.getKVR());
+        existingPatient.setHealthInsuranceProvider(patientDetails.getHealthInsuranceProvider());
+        existingPatient.setName(patientDetails.getName());
+        existingPatient.setSurname(patientDetails.getSurname());
+        existingPatient.setBirthday(patientDetails.getBirthday());
+        existingPatient.setWeightKg(patientDetails.getWeightKg());
+        existingPatient.setHeightCm(patientDetails.getHeightCm());
+        existingPatient.setEmail(patientDetails.getEmail());
+        existingPatient.setPhone(patientDetails.getPhone());
+        existingPatient.setStreet(patientDetails.getStreet());
+        existingPatient.setHouseNumber(patientDetails.getHouseNumber());
+        existingPatient.setPostalCode(patientDetails.getPostalCode());
+        existingPatient.setCity(patientDetails.getCity());
+
+
+        patientRepository.save(existingPatient);
+        return ResponseEntity.ok().body(existingPatient);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<Iterable<Patient>> getAllPatients() {
         Iterable<Patient> patients = patientRepository.findAll();
@@ -107,16 +138,36 @@ public class PatientController {
     ============================================================================
     */
 
-    @PostMapping("/{id}/ice")
-    public ResponseEntity<ICE> createICE(@RequestBody ICE ice, @PathVariable long id) {
-        // TODO validations
-        ResponseEntity validated = validateId(id, ice.getPatientId());
+    @PutMapping("/{id}/ice")
+    public ResponseEntity<ICE> updateICE(@RequestBody ICE iceDetails, @PathVariable long id) {
+
+        ResponseEntity validated = validateId(id, iceDetails.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
-        iceRepository.save(ice);
-        return ResponseEntity.ok().body(ice);
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+
+        if (!optionalPatient.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Patient patient = optionalPatient.get();
+        ICE existingICE = patient.getICE();
+        if (existingICE == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingICE.setName(iceDetails.getName());
+        existingICE.setSurname(iceDetails.getSurname());
+        existingICE.setCity(iceDetails.getCity());
+        existingICE.setPhone(iceDetails.getPhone());
+        existingICE.setStreet(iceDetails.getStreet());
+        existingICE.setPostalCode(iceDetails.getPostalCode());
+        existingICE.setRelationship(iceDetails.getRelationship());
+
+        iceRepository.save(existingICE);
+        return ResponseEntity.ok().body(existingICE);
     }
 
     @GetMapping("/{id}/ice")
@@ -150,6 +201,38 @@ public class PatientController {
         allergy.setSeverity(severityEnum);
         allergyRepository.save(allergy);
         return ResponseEntity.ok().body(allergy);
+    }
+    @PutMapping("{id}/allergy")
+    public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergyDetails, @PathVariable long id, String severity) {
+        ResponseEntity validated = validateId(id, allergyDetails.getPatientId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (!optionalPatient.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Allergy> optionalAllergy = allergyRepository.findById(allergyDetails.getId());
+        if (!optionalAllergy.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Allergy existingAllergy = optionalAllergy.get();
+        if (!existingAllergy.getPatientId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Severity severityEnum = getSeverity(severity);
+        existingAllergy.setSeverity(severityEnum);
+        existingAllergy.setAllergen(allergyDetails.getAllergen());
+        existingAllergy.setReaction(allergyDetails.getReaction());
+        existingAllergy.setNotes(allergyDetails.getNotes());
+        existingAllergy.setDateDiagnosed(allergyDetails.getDateDiagnosed());
+
+        allergyRepository.save(existingAllergy);
+        return ResponseEntity.ok().body(existingAllergy);
     }
 
     @GetMapping("/{id}/allergy/all")
