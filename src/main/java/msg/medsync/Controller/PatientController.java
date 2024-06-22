@@ -54,36 +54,6 @@ public class PatientController {
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
-        Optional<Patient> optionalPatient = patientRepository.findById(id);
-
-        if (optionalPatient.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Patient existingPatient = optionalPatient.get();
-        existingPatient.setICE(patient.getICE());
-        existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
-        existingPatient.setKVR(patient.getKVR());
-        existingPatient.setHealthInsuranceProvider(patient.getHealthInsuranceProvider());
-        existingPatient.setName(patient.getName());
-        existingPatient.setSurname(patient.getSurname());
-        existingPatient.setBirthday(patient.getBirthday());
-        existingPatient.setWeightKg(patient.getWeightKg());
-        existingPatient.setHeightCm(patient.getHeightCm());
-        existingPatient.setEmail(patient.getEmail());
-        existingPatient.setPhone(patient.getPhone());
-        existingPatient.setStreet(patient.getStreet());
-        existingPatient.setHouseNumber(patient.getHouseNumber());
-        existingPatient.setPostalCode(patient.getPostalCode());
-        existingPatient.setCity(patient.getCity());
-
-
-        patientRepository.save(existingPatient);
-        return ResponseEntity.ok().body(existingPatient);
-    }
-
     @GetMapping("/all")
     public ResponseEntity<Iterable<Patient>> getAllPatients() {
         Iterable<Patient> patients = patientRepository.findAll();
@@ -153,6 +123,36 @@ public class PatientController {
             patientRepository.deleteById(id);
             return ResponseEntity.ok().body("Patient deleted");
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Patient existingPatient = optionalPatient.get();
+        existingPatient.setICE(patient.getICE());
+        existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
+        existingPatient.setKVR(patient.getKVR());
+        existingPatient.setHealthInsuranceProvider(patient.getHealthInsuranceProvider());
+        existingPatient.setName(patient.getName());
+        existingPatient.setSurname(patient.getSurname());
+        existingPatient.setBirthday(patient.getBirthday());
+        existingPatient.setWeightKg(patient.getWeightKg());
+        existingPatient.setHeightCm(patient.getHeightCm());
+        existingPatient.setEmail(patient.getEmail());
+        existingPatient.setPhone(patient.getPhone());
+        existingPatient.setStreet(patient.getStreet());
+        existingPatient.setHouseNumber(patient.getHouseNumber());
+        existingPatient.setPostalCode(patient.getPostalCode());
+        existingPatient.setCity(patient.getCity());
+
+
+        patientRepository.save(existingPatient);
+        return ResponseEntity.ok().body(existingPatient);
     }
 
     /*
@@ -245,15 +245,37 @@ public class PatientController {
         }
     }
 
-    @DeleteMapping("/{id}/allergy")
-    public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
-        if(!allergyRepository.existsById(id)) {
+    @DeleteMapping("/{id}/allergy/all")
+    public ResponseEntity<Iterable<Allergy>> deleteAllAllergiesById(@PathVariable long id) {
+        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
+        if (!allergies.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
             allergyRepository.deleteById(id);
             return ResponseEntity.ok().body("Allergy deleted");
         }
     }
+    
+    public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
+    @DeleteMapping("/{id}/")
+    public ResponseEntity<Iterable<Allergy>> deleteAllergyById(@PathVariable long id) {
+        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
+        if (allergies.
+            if(!allergyRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            allergyRepository.deleteById(id);
+            return ResponseEntity.ok().body("Allergy deleted");
+        }
+    }
+
+    @DeleteMapping("/{id}/allergy/{allergyid}")
+    public ResponseEntity<String> deleteAllergy(@PathVariable long id, long allergyid) {
+        if(!allergy.existsById(id)) {
+            
+        }
+    }
+
 
     @PutMapping("{id}/allergy")
     public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergy, @PathVariable long id) {

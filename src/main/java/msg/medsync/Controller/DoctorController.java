@@ -35,8 +35,47 @@ public class DoctorController {
         }
     }
 
-    // TODO @GetMapping
-    // TODO @DeleteMapping
-    // TODO @PutMapping
+    @PostMapping("{id}/add/patient/{patiendId}")
+    public ResponseEntity<PatientDoctor> addPatient(@PathVariable Long id, @PathVariable Long patientId) {
+        Optional<Patient> patient = patientRepository.findById(patientId);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Patient currentPatient = patient.get();
+            PatientDoctor patientDoctor = new PatientDoctor();
+            patientDoctor.setPatientId(currentPatient.getPatientId());
+            patientDoctor.setDoctorId(id);
+            patientDoctor.setPatientName(currentPatient.getName());
+            patientDoctor.setPatientSurname(currentPatient.getSurname());
+            patientDoctor.setPatientKVR(currentPatient.getKVR());
+            patientDoctorRepository.save(patientDoctor);
+            return ResponseEntity.ok().body(patientDoctor);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable long id) {
+        if(!doctorRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            doctorRepository.deleteById(id);
+            return ResponseEntity.ok().body("Doctor deleted");
+        }
+    }
+
+    @DeleteMapping("/{id}/patient/{patientid}")
+    public ResponseEntity<String> deletePatientDoctor(@PathVariable long id, @PathVariable long patiendId) {
+        if(!)
+    }
+    @DeleteMapping("{id}/patient/{patientid}")
+    public ResponseEntity<String> deletePatientDoctor(@PathVariable Long id, @PathVariable Long patientId) {
+    Optional<PatientDoctor> patientDoctor = patientDoctorRepository.findByPatientIdAndDoctorId(patientId, id);
+    if (patientDoctor.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    } else {
+        patientDoctorRepository.delete(patientDoctor.get());
+        return ResponseEntity.noContent().build();
+    }
+}
 
 }
