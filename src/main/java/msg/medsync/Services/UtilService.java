@@ -2,6 +2,9 @@ package msg.medsync.Services;
 
 import msg.medsync.Models.ReportType;
 import msg.medsync.Models.Severity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class UtilService {
 
@@ -25,5 +28,13 @@ public class UtilService {
             case "pathology_report" -> ReportType.PATHOLOGY_REPORT;
             default -> throw new IllegalArgumentException("Unknown report type: " + type);
         };
+    }
+
+    public static ResponseEntity validateId(long Id, long BodyId) {
+        if(Id != BodyId) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
 }
