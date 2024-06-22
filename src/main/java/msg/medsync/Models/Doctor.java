@@ -1,7 +1,6 @@
 package msg.medsync.Models;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,38 +10,32 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Table(name = "doctor")
 public class Doctor {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long doctorId;
+
     private String name;
     private String surname;
     private String speciality;
     private String email;
     private String phone;
     private String street;
-    @Column(name = "housenumber")
     private String houseNumber;
-    @Column(name = "postalcode")
     private String postalCode;
     private String city;
 
-    @OneToMany(mappedBy = "doctor")
-    private List<PatientDoctor> patientDoctors;
+    @ManyToMany(mappedBy = "doctors")
+    private List<Patient> patients;
 
-    public Doctor(String name, String surname, String speciality, String email, String phone, String street, String houseNumber, String postalCode, String city) {
-        this.name = name;
-        this.surname = surname;
-        this.speciality = speciality;
-        this.email = email;
-        this.phone = phone;
-        this.street = street;
-        this.houseNumber = houseNumber;
-        this.postalCode = postalCode;
-        this.city = city;
-    }
+    @OneToMany(mappedBy = "prescribingDoctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Drug> drugs;
+
+    @OneToMany(mappedBy = "administeringDoctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vaccination> vaccinations;
+
+    @OneToMany(mappedBy = "issuedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Diagnosis> diagnoses;
 }

@@ -12,5 +12,5 @@ public interface PatientRepository extends CrudRepository<Patient, Long> {
     Iterable<Patient> findAllByNameAndSurname(String name, String surname);
     Iterable<Patient> findAllBySurname(String surname);
     Iterable<Patient> findAllByKVR(String KVR);
-    Optional<Patient> findByKVRAndHealthInsuranceProvider(String KVR, String healthInsuranceProvider);
+    Optional<Patient> findByKVRAndHip(String KVR, String HIP);
 }
