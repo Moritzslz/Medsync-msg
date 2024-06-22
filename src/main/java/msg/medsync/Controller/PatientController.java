@@ -214,7 +214,10 @@ public class PatientController {
         return ResponseEntity.ok().body(vaccination);
     }
 
-    // TODO @GetMapping
+    @GetMapping("{id}/vaccination")
+    public ResponseEntity<Iterable<Vaccination>> getVaccinationById(@PathVariable long id) {
+
+    }
 
     @DeleteMapping("/{id}/vaccination/")
     public ResponseEntity<String> deleteVaccination(@PathVariable long id) {

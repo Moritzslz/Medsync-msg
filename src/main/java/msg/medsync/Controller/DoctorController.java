@@ -1,7 +1,6 @@
 package msg.medsync.Controller;
 
 import msg.medsync.Models.Doctor;
-import msg.medsync.Models.Patient;
 import msg.medsync.Models.PatientDoctor;
 import msg.medsync.Repositories.*;
 import org.springframework.http.ResponseEntity;
