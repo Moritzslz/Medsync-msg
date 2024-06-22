@@ -1,5 +1,6 @@
 package msg.medsync.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "patient_doctor")
+@JsonIgnoreProperties({"patient"})
 public class PatientDoctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
