@@ -2,6 +2,7 @@ package msg.medsync.Controller;
 
 import msg.medsync.Models.*;
 import msg.medsync.Repositories.*;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -141,7 +142,16 @@ public class PatientController {
         }
     }
 
-    // TODO @DeleteMapping
+    @DeleteMapping("/{id}/ice/delete")
+    public ResponseEntity<String> deleteIce(@PathVariable long id) {
+        if(!iceRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            iceRepository.deleteById(id);
+            return ResponseEntity.ok().body("Emergency contact deleted");
+        }
+    }
+
     // TODO @PutMapping
 
     /*
@@ -174,9 +184,23 @@ public class PatientController {
         }
     }
 
-    // TODO @GetMapping
-    // TODO @DeleteMapping
+    @DeleteMapping("/{id}/allergy")
+    public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
+        if(!allergyRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            allergyRepository.deleteById(id);
+            return ResponseEntity.ok().body("Allergy deleted");
+        }
+    }
+
     // TODO @PutMapping
+
+    /*
+    ============================================================================
+    Vaccination
+    ============================================================================
+    */
 
     @PostMapping("/{id}/vaccination")
     public ResponseEntity<Vaccination> addVaccination(@RequestBody Vaccination vaccination, @PathVariable long id) {
@@ -191,8 +215,25 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    // TODO @DeleteMapping
+
+    @DeleteMapping("/{id}/vaccination/")
+    public ResponseEntity<String> deleteVaccination(@PathVariable long id) {
+        if(!vaccinationRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            vaccinationRepository.deleteById(id);
+            return ResponseEntity.ok().body("Vaccination deleted");
+        }
+    }
+
     // TODO @PutMapping
+
+
+    /*
+    ============================================================================
+    Diagnosis
+    ============================================================================
+    */
 
     @PostMapping("/{id}/diagnosis")
     public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, String severity,  @PathVariable long id) {
@@ -209,8 +250,26 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    // TODO @DeleteMapping
+
+    @DeleteMapping("/{id}/diagnosis/delete")
+    public ResponseEntity<String> deleteDiagnosis(@PathVariable long id) {
+        if(!diagnosisRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            diagnosisRepository.deleteById(id);
+            return ResponseEntity.ok().body("Diagnosis deleted");
+        }
+    }
+
+
     // TODO @PutMapping
+
+
+    /*
+    ============================================================================
+    Report
+    ============================================================================
+    */
 
     @PostMapping("/{id}/report")
     public ResponseEntity<Report> addReport(@RequestBody Report report, String type, @PathVariable long id) {
@@ -227,8 +286,24 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    // TODO @DeleteMapping
+
+    @DeleteMapping("/{id}/report")
+    public ResponseEntity<String> deleteReport(@PathVariable long id) {
+        if(!reportRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            reportRepository.deleteById(id);
+            return ResponseEntity.ok().body("Report deleted");
+        }
+    }
+
     // TODO @PutMapping
+
+    /*
+    ============================================================================
+    Drug
+    ============================================================================
+    */
 
     @PostMapping("/{id}/drug")
     public ResponseEntity<Drug> addDrug(@RequestBody Drug drug, @PathVariable long id) {
@@ -243,6 +318,16 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    // TODO @DeleteMapping
+
+    @DeleteMapping("/{id}/drug/delete")
+    public ResponseEntity<String> deleteDrug(@PathVariable long id) {
+        if(!drugRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            drugRepository.deleteById(id);
+            return ResponseEntity.ok().body("Drug deleted");
+        }
+    }
+
     // TODO @PutMapping
 }
