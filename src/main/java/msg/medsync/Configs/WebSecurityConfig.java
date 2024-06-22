@@ -37,12 +37,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedHeaders(List.of(
-                HttpHeaders.AUTHORIZATION,
-                HttpHeaders.CONTENT_TYPE,
-                "X-XSRF-TOKEN",
-                "RECAPTCHA")
-        );
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
