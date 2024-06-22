@@ -48,6 +48,7 @@ public class DoctorController {
     @PostMapping("{id}/add/patient/{patiendId}")
     public ResponseEntity<PatientDoctor> addPatient(@PathVariable Long id, @PathVariable Long patientId) {
         Optional<Patient> patient = patientRepository.findById(patientId);
+
         Optional<Doctor> doctor = doctorRepository.findById(id);
         if (patient.isEmpty() || doctor.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -64,6 +65,7 @@ public class DoctorController {
             return ResponseEntity.ok().body(patientDoctor);
         }
     }
+
 
     @PutMapping("/{doctorId}")
     public ResponseEntity<Doctor> updateDoctor(@PathVariable Long doctorId, @RequestBody Doctor doctorDetails) {
@@ -86,8 +88,34 @@ public class DoctorController {
         doctorRepository.save(existingDoctor);
         return ResponseEntity.ok().body(existingDoctor);
     }
-    // TODO @GetMapping
-    // TODO @DeleteMapping
-    // TODO @PutMapping
 
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable long id) {
+        if(!doctorRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        } else {
+            doctorRepository.deleteById(id);
+            return ResponseEntity.ok().body("Doctor deleted");
+        }
+    }
+
+    @DeleteMapping("{id}/patient/{patientId}")
+    public ResponseEntity<String> deletePatientDoctor(@PathVariable Long id, @PathVariable Long patientId) {
+        List<PatientDoctor> patients = patientDoctorRepository.findByPatientId(patientId);
+        if (patients.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Optional<PatientDoctor> patientDoctors = patients.stream()
+                .filter(pd -> pd.getDoctorId().equals(id))
+                .findFirst();
+            
+            if (patientDoctors.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            } else {
+                patientDoctorRepository.delete(patientDoctors.get());
+                return ResponseEntity.ok().body("Patient deleted from doctor");
+            }
+        }
+    }
 }
