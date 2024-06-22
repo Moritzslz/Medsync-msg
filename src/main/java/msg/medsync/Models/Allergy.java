@@ -23,11 +23,11 @@ public class Allergy {
     private Long patientId;
     private String allergen;
     private String reaction;
-    private Severity severity;
+    private String severity;
     private Date dateDiagnosed;
     private String notes;
 
-    public Allergy(Long patientId, String allergen, String reaction, Severity severity, Date dateDiagnosed, String notes) {
+    public Allergy(Long patientId, String allergen, String reaction, String severity, Date dateDiagnosed, String notes) {
         this.patientId = patientId;
         this.allergen = allergen;
         this.reaction = reaction;
