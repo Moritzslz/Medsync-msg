@@ -345,7 +345,38 @@ public class PatientController {
     }
 
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/diagnosis")
+    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosisDetails, @PathVariable long id, @RequestParam String severity) {
+        ResponseEntity validated = validateId(id, diagnosisDetails.getPatientId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (!optionalPatient.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Diagnosis> optionalDiagnosis = diagnosisRepository.findById(diagnosisDetails.getId());
+        if (!optionalDiagnosis.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Diagnosis existingDiagnosis = optionalDiagnosis.get();
+        if (!existingDiagnosis.getPatientId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Severity severityEnum = getSeverity(severity);
+        existingDiagnosis.setSeverity(severityEnum);
+        existingDiagnosis.setDescription(diagnosisDetails.getDescription());
+        existingDiagnosis.setIllness(diagnosisDetails.getIllness());
+        existingDiagnosis.setIssuedBy(diagnosisDetails.getIssuedBy());
+        existingDiagnosis.setDateDiagnosed(diagnosisDetails.getDateDiagnosed());
+
+        diagnosisRepository.save(existingDiagnosis);
+        return ResponseEntity.ok().body(existingDiagnosis);
+    }
 
 
     /*
