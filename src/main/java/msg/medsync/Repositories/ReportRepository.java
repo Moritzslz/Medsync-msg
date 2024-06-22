@@ -2,7 +2,6 @@ package msg.medsync.Repositories;
 
 import msg.medsync.Models.Patient;
 import msg.medsync.Models.Report;
-import msg.medsync.Models.ReportType;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

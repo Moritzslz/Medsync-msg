@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -32,16 +33,16 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}/patients")
-    public ResponseEntity<Iterable<PatientDoctor>> getAllPatients(@PathVariable long id) {
+    public ResponseEntity<List<PatientDoctor>> getAllPatients(@PathVariable long id) {
         Optional<Doctor> doctor = doctorRepository.findById(id);
         if (doctor.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByDoctor(doctor.get());
-        if (!patientDoctorIterable.iterator().hasNext()) {
+        List<PatientDoctor> patientDoctorList = (List<PatientDoctor>) patientDoctorRepository.findAllByDoctor(doctor.get());
+        if (!patientDoctorList.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            return ResponseEntity.ok().body(patientDoctorIterable);
+            return ResponseEntity.ok().body(patientDoctorList);
         }
     }
 
@@ -60,7 +61,7 @@ public class DoctorController {
             patientDoctor.setDoctor(currentDoctor);
             patientDoctor.setPatientName(currentPatient.getName());
             patientDoctor.setPatientSurname(currentPatient.getSurname());
-            patientDoctor.setPatientKVR(currentPatient.getKVR());
+            patientDoctor.setPatientKvr(currentPatient.getKvr());
             patientDoctorRepository.save(patientDoctor);
             return ResponseEntity.ok().body(patientDoctor);
         }
@@ -88,6 +89,49 @@ public class DoctorController {
         doctorRepository.save(existingDoctor);
         return ResponseEntity.ok().body(existingDoctor);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Doctor>> getAllDoctors() {
+        List<Doctor> doctors = (List<Doctor>) doctorRepository.findAll();
+        if (doctors.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(doctors);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Doctor> getDoctorById(@PathVariable long id) {
+        Optional<Doctor> doctor = doctorRepository.findById(id);
+        if (doctor.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(doctor.get());
+        }
+    }
+
+    @GetMapping("/{name}/{surname}")
+    public ResponseEntity<List<Doctor>> getPatientByNameAndSurname(@PathVariable String name, @PathVariable String surname) {
+        List<Doctor> doctors = (List<Doctor>) doctorRepository.findAllByNameAndSurname(name, surname);
+        if (doctors.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(doctors);
+        }
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Patient> getPatientByEmail(@PathVariable String email) {
+        Optional<Patient> patient = patientRepository.findByEmail(email);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(patient.get());
+        }
+    }
+
+    // TODO @DeleteMapping
+    // TODO @PutMapping
 
 
     @DeleteMapping("/{id}")

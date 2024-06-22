@@ -1,5 +1,6 @@
 package msg.medsync.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "doctor")
+@JsonIgnoreProperties({"patients"})
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,10 @@ public class Doctor {
     private String postalCode;
     private String city;
 
-    @ManyToMany(mappedBy = "doctors")
+    @ManyToMany()
+    @JoinTable(name = "patient_doctor",
+            joinColumns = @JoinColumn(name = "doctor_id"),
+            inverseJoinColumns = @JoinColumn(name = "patient_id"))
     private List<Patient> patients;
 
     @OneToMany(mappedBy = "prescribingDoctor", cascade = CascadeType.ALL, orphanRemoval = true)

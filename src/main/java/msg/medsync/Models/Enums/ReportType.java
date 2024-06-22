@@ -1,4 +1,4 @@
-package msg.medsync.Models;
+package msg.medsync.Models.Enums;
 
 public enum ReportType {
     LAB_RESULTS,
