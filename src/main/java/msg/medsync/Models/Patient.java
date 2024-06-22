@@ -1,32 +1,33 @@
 package msg.medsync.Models;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 @Table(name = "patient")
 public class Patient {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long patientId;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ICE", referencedColumnName = "iceId")
+
+    @OneToOne
+    @JoinColumn(name = "ICE", referencedColumnName = "iceId", nullable = true)
     private ICE ICE;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "familyDoctor", referencedColumnName = "doctorId")
+
+    @ManyToOne
+    @JoinColumn(name = "family_doctor", referencedColumnName = "doctorId", nullable = true)
     private Doctor familyDoctor;
+
     private String KVR;
-    private String healthInsuranceProvider;
+    private String hip;
     private String name;
     private String surname;
     private Date birthday;
@@ -39,21 +40,24 @@ public class Patient {
     private String postalCode;
     private String city;
 
-    public Patient(msg.medsync.Models.ICE ICE, Doctor familyDoctor, String KVR, String healthInsuranceProvider, String name, String surname, Date birthday, int weightKg, int heightCm, String email, String phone, String street, String houseNumber, String postalCode, String city) {
-        this.ICE = ICE;
-        this.familyDoctor = familyDoctor;
-        this.KVR = KVR;
-        this.healthInsuranceProvider = healthInsuranceProvider;
-        this.name = name;
-        this.surname = surname;
-        this.birthday = birthday;
-        this.weightKg = weightKg;
-        this.heightCm = heightCm;
-        this.email = email;
-        this.phone = phone;
-        this.street = street;
-        this.houseNumber = houseNumber;
-        this.postalCode = postalCode;
-        this.city = city;
-    }
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Allergy> allergies;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Drug> drugs;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vaccination> vaccinations;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Diagnosis> diagnoses;
+
+    @ManyToMany
+    @JoinTable(name = "patient_doctor",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+    private List<Doctor> doctors;
 }

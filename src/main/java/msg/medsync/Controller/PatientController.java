@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static msg.medsync.Services.UtilService.*;
@@ -23,11 +24,13 @@ public class PatientController {
     private final DrugRepository drugRepository;
     private final ReportRepository reportRepository;
     private final PatientDoctorRepository patientDoctorRepository;
+    private final DoctorRepository doctorRepository;
 
     public PatientController(PatientRepository patientRepository, AllergyRepository allergyRepository,
                              ICERepository iceRepository, VaccinationRepository vaccinationRepository,
                              DiagnosisRepository diagnosisRepository, DrugRepository drugRepository,
-                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository) {
+                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository,
+                             DoctorRepository doctorRepository) {
         this.patientRepository = patientRepository;
         this.allergyRepository = allergyRepository;
         this.iceRepository = iceRepository;
@@ -36,6 +39,7 @@ public class PatientController {
         this.drugRepository = drugRepository;
         this.reportRepository = reportRepository;
         this.patientDoctorRepository = patientDoctorRepository;
+        this.doctorRepository = doctorRepository;
     }
 
      /*
@@ -47,17 +51,77 @@ public class PatientController {
     @PostMapping("/register")
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
         // TODO validations
-        HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHealthInsuranceProvider());
-        patient.setHealthInsuranceProvider(hip.name());
-        patientRepository.save(patient);
+        HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHip());
+        patient.setHip(hip.name());
+        Patient patientSaved = patientRepository.save(patient);
+
+        PatientDoctor patientDoctor = new PatientDoctor();
+        patientDoctor.setPatient(patientSaved);
+        patientDoctor.setDoctor(patientSaved.getFamilyDoctor());
+        patientDoctor.setPatientName(patientSaved.getName());
+        patientDoctor.setPatientSurname(patientSaved.getSurname());
+        patientDoctor.setPatientKVR(patientSaved.getKVR());
+        patientDoctorRepository.save(patientDoctor);
+
+        ICE ice = patientSaved.getICE();
+        iceRepository.save(ice);
         return ResponseEntity.ok().body(patient);
     }
 
+    @PostMapping("{id}/add/doctor/{doctorId}")
+    public ResponseEntity<PatientDoctor> addDoctor(@PathVariable Long id, @PathVariable Long doctorId) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        Optional<Doctor> doctor = doctorRepository.findById(doctorId);
+        if (patient.isEmpty() || doctor.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Patient currentPatient = patient.get();
+            Doctor currentDoctor = doctor.get();
+            PatientDoctor patientDoctor = new PatientDoctor();
+            patientDoctor.setPatient(currentPatient);
+            patientDoctor.setDoctor(currentDoctor);
+            patientDoctor.setPatientName(currentPatient.getName());
+            patientDoctor.setPatientSurname(currentPatient.getSurname());
+            patientDoctor.setPatientKVR(currentPatient.getKVR());
+            patientDoctorRepository.save(patientDoctor);
+            return ResponseEntity.ok().body(patientDoctor);
+        }
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Patient existingPatient = optionalPatient.get();
+        existingPatient.setICE(patient.getICE());
+        existingPatient.setFamilyDoctor(patient.getFamilyDoctor());
+        existingPatient.setKVR(patient.getKVR());
+        existingPatient.setHip(patient.getHip());
+        existingPatient.setName(patient.getName());
+        existingPatient.setSurname(patient.getSurname());
+        existingPatient.setBirthday(patient.getBirthday());
+        existingPatient.setWeightKg(patient.getWeightKg());
+        existingPatient.setHeightCm(patient.getHeightCm());
+        existingPatient.setEmail(patient.getEmail());
+        existingPatient.setPhone(patient.getPhone());
+        existingPatient.setStreet(patient.getStreet());
+        existingPatient.setHouseNumber(patient.getHouseNumber());
+        existingPatient.setPostalCode(patient.getPostalCode());
+        existingPatient.setCity(patient.getCity());
+
+        patientRepository.save(existingPatient);
+        return ResponseEntity.ok().body(existingPatient);
+    }
 
     @GetMapping("/all")
-    public ResponseEntity<Iterable<Patient>> getAllPatients() {
-        Iterable<Patient> patients = patientRepository.findAll();
-        if (!patients.iterator().hasNext()) {
+    public ResponseEntity<List<Patient>> getAllPatients() {
+        List<Patient> patients = (List<Patient>) patientRepository.findAll();
+        if (patients.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok().body(patients);
@@ -97,7 +161,7 @@ public class PatientController {
     @GetMapping("/{kvr}/{hip}")
     public ResponseEntity<Patient> getPatientByKVTAndHIP(@PathVariable String kvr, String hip) {
         HealthInsuranceProvider HIP = getHealthInsuranceProvider(hip);
-        Optional<Patient> patient = patientRepository.findByKVRAndHealthInsuranceProvider(kvr, HIP.name());
+        Optional<Patient> patient = patientRepository.findByKVRAndHip(kvr, HIP.name());
         if (patient.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -107,7 +171,11 @@ public class PatientController {
 
     @GetMapping("/{id}/doctors")
     public ResponseEntity<Iterable<PatientDoctor>> getAllDoctors(@PathVariable long id) {
-        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatientId(id);
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatient(patient.get());
         if (!patientDoctorIterable.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -164,7 +232,11 @@ public class PatientController {
 
     @GetMapping("/{id}/ice")
     public ResponseEntity<ICE> getICEById(@PathVariable long id) {
-        Optional<ICE> ice = iceRepository.findByPatientId(id);
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Optional<ICE> ice = iceRepository.findByPatient(patient.get());
         if (ice.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -185,7 +257,7 @@ public class PatientController {
     @PutMapping("/{id}/ice")
     public ResponseEntity<ICE> updateICE(@RequestBody ICE ice, @PathVariable long id) {
 
-        ResponseEntity validated = validateId(id, ice.getPatientId());
+        ResponseEntity validated = validateId(id, ice.getIceId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -223,7 +295,7 @@ public class PatientController {
     @PostMapping("/{id}/allergy")
     public ResponseEntity<Allergy> addAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, allergy.getPatientId());
+        ResponseEntity validated = validateId(id, allergy.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -237,8 +309,12 @@ public class PatientController {
     }
 
     @GetMapping("/{id}/allergy/all")
-    public ResponseEntity<Iterable<Allergy>> findAllAllergiesById(@PathVariable long id) {
-        Iterable<Allergy> allergies = allergyRepository.findAllByPatientId(id);
+    public ResponseEntity<List<Allergy>> findAllAllergiesById(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Allergy> allergies = (List<Allergy>) allergyRepository.findAllByPatient(patient.get());
         if (!allergies.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -271,7 +347,7 @@ public class PatientController {
 
     @PutMapping("{id}/allergy")
     public ResponseEntity<Allergy> updateAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
-        ResponseEntity validated = validateId(id, allergy.getPatientId());
+        ResponseEntity validated = validateId(id, allergy.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -287,7 +363,7 @@ public class PatientController {
         }
 
         Allergy existingAllergy = optionalAllergy.get();
-        if (!existingAllergy.getPatientId().equals(id)) {
+        if (!existingAllergy.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
@@ -311,7 +387,7 @@ public class PatientController {
     @PostMapping("/{id}/vaccination")
     public ResponseEntity<Vaccination> addVaccination(@RequestBody Vaccination vaccination, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, vaccination.getPatientId());
+        ResponseEntity validated = validateId(id, vaccination.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -321,8 +397,12 @@ public class PatientController {
     }
 
     @GetMapping("{id}/vaccination")
-    public ResponseEntity<Iterable<Vaccination>> getVaccinationById(@PathVariable long id) {
-        Iterable<Vaccination> vaccinations = vaccinationRepository.findAllByPatientId(id);
+    public ResponseEntity<List<Vaccination>> getVaccinationById(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Vaccination> vaccinations = (List<Vaccination>) vaccinationRepository.findAllByPatient(patient.get());
         if (!vaccinations.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -354,7 +434,37 @@ public class PatientController {
         }
     }
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/vaccination")
+    public ResponseEntity<Vaccination> updateVaccination(@RequestBody Vaccination vaccinationDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, vaccinationDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Vaccination> optionalVaccination = vaccinationRepository.findById(vaccinationDetails.getId());
+        if (optionalVaccination.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Vaccination existingVaccination = optionalVaccination.get();
+        if (!existingVaccination.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingVaccination.setVaccineName(vaccinationDetails.getVaccineName());
+        existingVaccination.setVaccinationDate(vaccinationDetails.getVaccinationDate());
+        existingVaccination.setDosage(vaccinationDetails.getDosage());
+        existingVaccination.setAdministeringDoctor(vaccinationDetails.getAdministeringDoctor());
+        existingVaccination.setNotificationDate(vaccinationDetails.getNotificationDate());
+
+        vaccinationRepository.save(existingVaccination);
+        return ResponseEntity.ok().body(existingVaccination);
+    }
 
 
     /*
@@ -364,20 +474,32 @@ public class PatientController {
     */
 
     @PostMapping("/{id}/diagnosis")
-    public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, String severity,  @PathVariable long id) {
+    public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, diagnosis.getPatientId());
+        ResponseEntity validated = validateId(id, diagnosis.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
-        Severity severityEnum = getSeverity(severity);
-        diagnosis.setSeverity(severityEnum);
+        Severity severity = getSeverity(diagnosis.getSeverity());
+        diagnosis.setSeverity(severity.name());
         diagnosisRepository.save(diagnosis);
         return ResponseEntity.ok().body(diagnosis);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/diagnosis")
+    public ResponseEntity<Iterable<Diagnosis>> getAllDiagnosisById(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Iterable<Diagnosis> diagnoses = diagnosisRepository.findAllByPatient(patient.get());
+        if (!diagnoses.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(diagnoses);
+        }
+    }
 
     @DeleteMapping("/{id}/diagnosis")
     public ResponseEntity<String> deleteAllDiagnosesByPatientId(@PathVariable long id) {
@@ -402,10 +524,9 @@ public class PatientController {
         }
     }
 
-
     @PutMapping("/{id}/diagnosis")
-    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id, @RequestParam String severity) {
-        ResponseEntity validated = validateId(id, diagnosis.getPatientId());
+    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, diagnosis.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -421,12 +542,12 @@ public class PatientController {
         }
 
         Diagnosis existingDiagnosis = optionalDiagnosis.get();
-        if (!existingDiagnosis.getPatientId().equals(id)) {
+        if (!existingDiagnosis.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Severity severityEnum = getSeverity(severity);
-        existingDiagnosis.setSeverity(severityEnum);
+        Severity severity = getSeverity(diagnosis.getSeverity());
+        existingDiagnosis.setSeverity(severity.name());
         existingDiagnosis.setDescription(diagnosis.getDescription());
         existingDiagnosis.setIllness(diagnosis.getIllness());
         existingDiagnosis.setIssuedBy(diagnosis.getIssuedBy());
@@ -446,7 +567,7 @@ public class PatientController {
     @PostMapping("/{id}/report")
     public ResponseEntity<Report> addReport(@RequestBody Report report, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, report.getPatientId());
+        ResponseEntity validated = validateId(id, report.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -457,7 +578,19 @@ public class PatientController {
         return ResponseEntity.ok().body(report);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/report")
+    public ResponseEntity<List<Report>> findAllReportsById(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Report> reports = (List<Report>) reportRepository.findAllByPatient(patient.get());
+        if (!reports.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(reports);
+        }
+    }
 
     @DeleteMapping("/{id}/report")
     public ResponseEntity<String> deleteAllReportsByPatientId(@PathVariable long id) {
@@ -481,9 +614,39 @@ public class PatientController {
         }
     }
 
+  
+    @PutMapping("/{id}/report")
+    public ResponseEntity<Report> updateReport(@RequestBody Report reportDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, reportDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Report> optionalReport = reportRepository.findById(reportDetails.getId());
+        if (optionalReport.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Report existingReport = optionalReport.get();
+        if (!existingReport.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingReport.setReportType(reportDetails.getReportType());
+        existingReport.setDate(reportDetails.getDate());
+        existingReport.setFindings(reportDetails.getFindings());
+        existingReport.setRecommendations(reportDetails.getRecommendations());
 
 
-    // TODO @PutMapping
+        reportRepository.save(existingReport);
+        return ResponseEntity.ok().body(existingReport);
+    }
+
 
     /*
     ============================================================================
@@ -494,7 +657,7 @@ public class PatientController {
     @PostMapping("/{id}/drug")
     public ResponseEntity<Drug> addDrug(@RequestBody Drug drug, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, drug.getPatientId());
+        ResponseEntity validated = validateId(id, drug.getId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
@@ -503,7 +666,19 @@ public class PatientController {
         return ResponseEntity.ok().body(drug);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/drug")
+    public ResponseEntity<List<Drug>> getAllDrugsByPatientId(@PathVariable long id) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Drug> drugs = (List<Drug>) drugRepository.findAllByPatient(patient.get());
+        if (!drugs.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(drugs);
+        }
+    }
 
     @DeleteMapping("/{id}/drug")
     public ResponseEntity<String> deleteDrug(@PathVariable long id) {
@@ -515,5 +690,37 @@ public class PatientController {
         }
     }
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/drug")
+    public ResponseEntity<Drug> updateDrug(@RequestBody Drug drugDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, drugDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Drug> optionalDrug = drugRepository.findById(drugDetails.getId());
+        if (optionalDrug.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Drug existingDrug = optionalDrug.get();
+        if (!existingDrug.getPatient().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingDrug.setName(drugDetails.getName());
+        existingDrug.setDosage(drugDetails.getDosage());
+        existingDrug.setFrequency(drugDetails.getFrequency());
+        existingDrug.setStartDate(drugDetails.getStartDate());
+        existingDrug.setEndDate(drugDetails.getEndDate());
+        existingDrug.setPrescribingDoctor(drugDetails.getPrescribingDoctor());
+        existingDrug.setSideEffects(drugDetails.getSideEffects());
+
+        drugRepository.save(existingDrug);
+        return ResponseEntity.ok().body(existingDrug);
+    }
 }
