@@ -19,13 +19,16 @@ public class Vaccination {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
     @OneToOne
-    @JoinColumn(name = "administeringDoctor", referencedColumnName = "doctorId")
+    @JoinColumn(name = "administeringdoctor", referencedColumnName = "doctorid")
     private Doctor administeringDoctor;
+    @Column(name ="vaccinename")
     private String vaccineName;
+    @Column(name ="vaccinationdate")
     private Date vaccinationDate;
+    @Column(name ="notificationdate")
     private Date notificationDate;
     private String dose;
 

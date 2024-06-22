@@ -17,23 +17,17 @@ public class PatientDoctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
-
-    @JoinColumn(name = "doctorId", referencedColumnName = "doctorId")
+    @JoinColumn(name = "doctorid", referencedColumnName = "doctorid")
     private Long doctorId;
-
-    @Column(name = "patientName")
+    @Column(name = "patientname")
     private String patientName;
-
-    @Column(name = "patientSurname")
+    @Column(name = "patientsurname")
     private String patientSurname;
-
-    @Column(name = "patientKVR")
+    @Column(name = "patientkvr")
     private String patientKVR;
-
-    @Column(name = "patientHIP")
+    @Column(name = "patienthip")
     private String patientHIP;
 
     public PatientDoctor(Long patientId, Long doctorId, String patientName, String patientSurname, String patientKVR, String patientHIP) {

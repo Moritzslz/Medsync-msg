@@ -20,14 +20,15 @@ public class Diagnosis {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
     @OneToOne
-    @JoinColumn(name = "issuedBy", referencedColumnName = "doctorId")
+    @JoinColumn(name = "issuedby", referencedColumnName = "doctorid")
     private Doctor issuedBy;
     private String illness;
     private String description;
     private String severity;
+    @Column(name = "datediagnosed")
     private Date dateDiagnosed;
 
     public Diagnosis(Long patientId, Doctor issuedBy, String illness, String description, String severity, Date dateDiagnosed) {

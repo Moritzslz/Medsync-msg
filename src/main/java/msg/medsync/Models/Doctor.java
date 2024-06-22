@@ -16,21 +16,24 @@ public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "doctorid")
     private Long doctorId;
     private String name;
     private String surname;
-    private String specialty;
+    private String speciality;
     private String email;
     private String phone;
     private String street;
+    @Column(name = "housenumber")
     private String houseNumber;
+    @Column(name = "postalcode")
     private String postalCode;
     private String city;
 
-    public Doctor(String name, String surname, String specialty, String email, String phone, String street, String houseNumber, String postalCode, String city) {
+    public Doctor(String name, String surname, String speciality, String email, String phone, String street, String houseNumber, String postalCode, String city) {
         this.name = name;
         this.surname = surname;
-        this.specialty = specialty;
+        this.speciality = speciality;
         this.email = email;
         this.phone = phone;
         this.street = street;

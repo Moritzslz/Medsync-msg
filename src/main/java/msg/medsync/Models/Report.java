@@ -19,13 +19,14 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
-    @JoinColumn(name = "diagnosisId", referencedColumnName = "id")
+    @JoinColumn(name = "diagnosisid", referencedColumnName = "id")
     private String diagnosisId;
     private String findings;
     private String recommendations;
     private Date date;
+    @Column(name ="reporttype")
     private String reportType;
 
     public Report(Long patientId, String diagnosisId, String findings, String recommendations, Date date, String reportType) {

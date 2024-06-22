@@ -18,24 +18,31 @@ public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "doctorid")
     private Long patientId;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ICE", referencedColumnName = "iceId")
+    @JoinColumn(name = "ICE", referencedColumnName = "iceid")
     private ICE ICE;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "familyDoctor", referencedColumnName = "doctorId")
+    @JoinColumn(name = "familydoctor", referencedColumnName = "doctorid")
     private Doctor familyDoctor;
+    @Column(name ="kvr")
     private String KVR;
+    @Column(name ="healthinsuranceprovider")
     private String healthInsuranceProvider;
     private String name;
     private String surname;
     private Date birthday;
+    @Column(name ="weightkg")
     private int weightKg;
+    @Column(name ="heightcm")
     private int heightCm;
     private String email;
     private String phone;
     private String street;
+    @Column(name ="housenumber")
     private String houseNumber;
+    @Column(name ="postalcode")
     private String postalCode;
     private String city;
 

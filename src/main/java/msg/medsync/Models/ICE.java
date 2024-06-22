@@ -17,7 +17,7 @@ public class ICE {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long iceId;
-    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
     private Long patientId;
     private String name;
     private String surname;
@@ -25,7 +25,9 @@ public class ICE {
     private String email;
     private String phone;
     private String street;
+    @Column(name ="housenumber")
     private String houseNumber;
+    @Column(name ="postalcode")
     private String postalCode;
     private String city;
 

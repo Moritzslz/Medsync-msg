@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface DoctorRepository extends CrudRepository<Doctor, Long> {
     Iterable<Doctor> findAllByNameAndSurname(String name, String surname);
     Iterable<Doctor> findAllBySurname(String surname);
-    Iterable<Doctor> findAllBySpecialty(String speciality);
+    Iterable<Doctor> findAllBySpeciality(String speciality);
     Iterable<Doctor> findAllByPostalCode(String postalCode);
     Optional<Doctor> findByEmail(String email);
 }
