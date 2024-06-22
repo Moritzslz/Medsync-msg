@@ -1,7 +1,6 @@
 package msg.medsync.Controller;
 
 import msg.medsync.Models.Doctor;
-import msg.medsync.Models.Patient;
 import msg.medsync.Repositories.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ public class DoctorController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> createPatient(@RequestBody Doctor doctor) {
+    public ResponseEntity<String> createDoctor(@RequestBody Doctor doctor) {
         // TODO validations
         doctorRepository.save(doctor);
         return ResponseEntity.ok().body("Doctor saved");
