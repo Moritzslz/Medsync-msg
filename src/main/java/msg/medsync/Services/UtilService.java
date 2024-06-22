@@ -52,7 +52,7 @@ public class UtilService {
         };
     }
 
-    public static Allergen getAllergene(String allergen) {
+    public static Allergen getAllergen(String allergen) {
         return switch (allergen.toLowerCase().trim()) {
             case "pollen" -> Allergen.POLLEN;
             case "dust" -> Allergen.DUST;

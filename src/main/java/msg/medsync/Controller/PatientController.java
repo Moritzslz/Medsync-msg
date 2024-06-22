@@ -268,16 +268,29 @@ public class PatientController {
 
     @PostMapping("/{id}/allergy")
     public ResponseEntity<Allergy> addAllergy(@RequestBody Allergy allergy, @PathVariable long id) {
-        // TODO validations
-        ResponseEntity validated = validateId(id, allergy.getId());
-        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
-            return validated;
+        // Fetch the patient by id
+        Optional<Patient> patientOptional = patientRepository.findById(id);
+        if (patientOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Allergen allergen =  getAllergene(allergy.getAllergen());
+        Patient patient = patientOptional.get();
+
+        // Check if the patient id matches
+        if (!patient.getPatientId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        // Set the patient to the allergy
+        allergy.setPatient(patient);
+
+        // Validate and set enums
+        Allergen allergen = getAllergen(allergy.getAllergen());
         Severity severity = getSeverity(allergy.getSeverity());
-        allergy.setSeverity(allergen.name());
+        allergy.setAllergen(allergen.name());
         allergy.setSeverity(severity.name());
+
+        // Save the allergy
         allergyRepository.save(allergy);
         return ResponseEntity.ok().body(allergy);
     }
@@ -365,11 +378,6 @@ public class PatientController {
     @PostMapping("/{id}/vaccination")
     public ResponseEntity<Vaccination> addVaccination(@RequestBody Vaccination vaccination, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, vaccination.getId());
-        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
-            return validated;
-        }
-
         vaccinationRepository.save(vaccination);
         return ResponseEntity.ok().body(vaccination);
     }
@@ -458,11 +466,6 @@ public class PatientController {
     @PostMapping("/{id}/diagnosis")
     public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id) {
         // TODO validations
-        ResponseEntity validated = validateId(id, diagnosis.getId());
-        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
-            return validated;
-        }
-
         Severity severity = getSeverity(diagnosis.getSeverity());
         diagnosis.setSeverity(severity.name());
         diagnosisRepository.save(diagnosis);
