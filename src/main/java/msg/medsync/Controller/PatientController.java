@@ -375,7 +375,37 @@ public class PatientController {
         }
     }
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/vaccination")
+    public ResponseEntity<Vaccination> updateVaccination(@RequestBody Vaccination vaccinationDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, vaccinationDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Vaccination> optionalVaccination = vaccinationRepository.findById(vaccinationDetails.getId());
+        if (optionalVaccination.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Vaccination existingVaccination = optionalVaccination.get();
+        if (!existingVaccination.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingVaccination.setVaccineName(vaccinationDetails.getVaccineName());
+        existingVaccination.setVaccinationDate(vaccinationDetails.getVaccinationDate());
+        existingVaccination.setDosage(vaccinationDetails.getDosage());
+        existingVaccination.setAdministeringDoctor(vaccinationDetails.getAdministeringDoctor());
+        existingVaccination.setNotificationDate(vaccinationDetails.getNotificationDate());
+
+        vaccinationRepository.save(existingVaccination);
+        return ResponseEntity.ok().body(existingVaccination);
+    }
 
 
     /*
@@ -500,7 +530,37 @@ public class PatientController {
         }
     }
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/report")
+    public ResponseEntity<Report> updateReport(@RequestBody Report reportDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, reportDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Report> optionalReport = reportRepository.findById(reportDetails.getId());
+        if (optionalReport.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Report existingReport = optionalReport.get();
+        if (!existingReport.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingReport.setReportType(reportDetails.getReportType());
+        existingReport.setDate(reportDetails.getDate());
+        existingReport.setFindings(reportDetails.getFindings());
+        existingReport.setRecommendations(reportDetails.getRecommendations());
+
+
+        reportRepository.save(existingReport);
+        return ResponseEntity.ok().body(existingReport);
+    }
 
     /*
     ============================================================================
@@ -544,5 +604,37 @@ public class PatientController {
         }
     }
 
-    // TODO @PutMapping
+    @PutMapping("/{id}/drug")
+    public ResponseEntity<Drug> updateDrug(@RequestBody Drug drugDetails, @PathVariable long id) {
+        ResponseEntity validated = validateId(id, drugDetails.getId());
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return validated;
+        }
+
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        if (optionalPatient.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Optional<Drug> optionalDrug = drugRepository.findById(drugDetails.getId());
+        if (optionalDrug.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Drug existingDrug = optionalDrug.get();
+        if (!existingDrug.getPatient().equals(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        existingDrug.setName(drugDetails.getName());
+        existingDrug.setDosage(drugDetails.getDosage());
+        existingDrug.setFrequency(drugDetails.getFrequency());
+        existingDrug.setStartDate(drugDetails.getStartDate());
+        existingDrug.setEndDate(drugDetails.getEndDate());
+        existingDrug.setPrescribingDoctor(drugDetails.getPrescribingDoctor());
+        existingDrug.setSideEffects(drugDetails.getSideEffects());
+
+        drugRepository.save(existingDrug);
+        return ResponseEntity.ok().body(existingDrug);
+    }
 }
