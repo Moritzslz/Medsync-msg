@@ -4,6 +4,7 @@ import msg.medsync.Models.Doctor;
 import msg.medsync.Models.Patient;
 import msg.medsync.Models.PatientDoctor;
 import msg.medsync.Repositories.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,27 @@ public class DoctorController {
         }
     }
 
+    @PutMapping("/{doctorId}")
+    public ResponseEntity<Doctor> updateDoctor(@PathVariable Long doctorId, @RequestBody Doctor doctorDetails) {
+        Optional<Doctor> optionalDoctor = doctorRepository.findById(doctorId);
+        if (optionalDoctor.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Doctor existingDoctor = optionalDoctor.get();
+        existingDoctor.setName(doctorDetails.getName());
+        existingDoctor.setSurname(doctorDetails.getSurname());
+        existingDoctor.setSpeciality(doctorDetails.getSpeciality());
+        existingDoctor.setEmail(doctorDetails.getEmail());
+        existingDoctor.setPhone(doctorDetails.getPhone());
+        existingDoctor.setStreet(doctorDetails.getStreet());
+        existingDoctor.setHouseNumber(doctorDetails.getHouseNumber());
+        existingDoctor.setPostalCode(doctorDetails.getPostalCode());
+        existingDoctor.setCity(doctorDetails.getCity());
+
+        doctorRepository.save(existingDoctor);
+        return ResponseEntity.ok().body(existingDoctor);
+    }
     // TODO @GetMapping
     // TODO @DeleteMapping
     // TODO @PutMapping
