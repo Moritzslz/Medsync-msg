@@ -1,9 +1,8 @@
 package msg.medsync.Services;
 
+import msg.medsync.Models.HealthInsuranceProvider;
 import msg.medsync.Models.ReportType;
 import msg.medsync.Models.Severity;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class UtilService {
@@ -27,6 +26,28 @@ public class UtilService {
             case "progress_note" -> ReportType.PROGRESS_NOTE;
             case "pathology_report" -> ReportType.PATHOLOGY_REPORT;
             default -> throw new IllegalArgumentException("Unknown report type: " + type);
+        };
+    }
+
+    public static HealthInsuranceProvider getHealthInsuranceProvider(String provider) {
+        return switch (provider.toLowerCase().trim()) {
+            case "aok" -> HealthInsuranceProvider.AOK;
+            case "tk" -> HealthInsuranceProvider.TK;
+            case "bkk" -> HealthInsuranceProvider.BKK;
+            case "dak" -> HealthInsuranceProvider.DAK;
+            case "barmer" -> HealthInsuranceProvider.BARMER;
+            case "hek" -> HealthInsuranceProvider.HEK;
+            case "kkh" -> HealthInsuranceProvider.KKH;
+            case "sbk" -> HealthInsuranceProvider.SBK;
+            case "ikk" -> HealthInsuranceProvider.IKK;
+            case "knappschaft" -> HealthInsuranceProvider.KNAPPSCHAFT;
+            case "hkk" -> HealthInsuranceProvider.HKK;
+            case "viactiv" -> HealthInsuranceProvider.VIACTIV;
+            case "securvita" -> HealthInsuranceProvider.SECURVITA;
+            case "pronova bkk" -> HealthInsuranceProvider.PRONOVA_BKK;
+            case "mercer" -> HealthInsuranceProvider.MERCER;
+            case "allianz" -> HealthInsuranceProvider.ALLIANZ;
+            default -> throw new IllegalArgumentException("Unknown health insurance provider: " + provider);
         };
     }
 
