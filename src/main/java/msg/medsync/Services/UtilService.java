@@ -1,9 +1,9 @@
 package msg.medsync.Services;
 
-import msg.medsync.Models.Allergen;
-import msg.medsync.Models.HealthInsuranceProvider;
-import msg.medsync.Models.ReportType;
-import msg.medsync.Models.Severity;
+import msg.medsync.Models.Enums.Allergen;
+import msg.medsync.Models.Enums.HealthInsuranceProvider;
+import msg.medsync.Models.Enums.ReportType;
+import msg.medsync.Models.Enums.Severity;
 import org.springframework.http.ResponseEntity;
 
 public class UtilService {

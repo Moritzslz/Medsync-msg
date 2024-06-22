@@ -15,7 +15,8 @@ public class ICE {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long iceId;
 
-    @OneToOne(mappedBy = "ICE")
+    @OneToOne
+    @JoinColumn(name = "patient_id")
     private Patient patient;
 
     private String name;

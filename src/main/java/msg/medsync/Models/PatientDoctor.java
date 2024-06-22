@@ -25,6 +25,6 @@ public class PatientDoctor {
 
     private String patientName;
     private String patientSurname;
-    private String patientKVR;
-    private String patientHIP;
+    private String patientKvr;
+    private String patientHip;
 }

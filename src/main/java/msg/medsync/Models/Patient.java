@@ -1,9 +1,12 @@
 package msg.medsync.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.Date;
 import java.util.List;
@@ -18,15 +21,14 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long patientId;
 
-    @OneToOne
-    @JoinColumn(name = "ICE", referencedColumnName = "iceId", nullable = true)
-    private ICE ICE;
+    @OneToOne(mappedBy = "patient")
+    private ICE ice;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "family_doctor", referencedColumnName = "doctorId", nullable = true)
     private Doctor familyDoctor;
 
-    private String KVR;
+    private String kvr;
     private String hip;
     private String name;
     private String surname;
@@ -55,9 +57,6 @@ public class Patient {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Diagnosis> diagnoses;
 
-    @ManyToMany
-    @JoinTable(name = "patient_doctor",
-            joinColumns = @JoinColumn(name = "patient_id"),
-            inverseJoinColumns = @JoinColumn(name = "doctor_id"))
+    @ManyToMany(mappedBy = "patients")
     private List<Doctor> doctors;
 }
