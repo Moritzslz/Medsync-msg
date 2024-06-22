@@ -13,9 +13,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "doctor")
 public class Doctor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long doctorId;
     private String name;
     private String surname;
     private String specialty;
@@ -26,8 +27,7 @@ public class Doctor {
     private String postalCode;
     private String city;
 
-    public Doctor(Long id, String name, String surname, String specialty, String email, String phone, String street, String houseNumber, String postalCode, String city) {
-        this.id = id;
+    public Doctor(String name, String surname, String specialty, String email, String phone, String street, String houseNumber, String postalCode, String city) {
         this.name = name;
         this.surname = surname;
         this.specialty = specialty;

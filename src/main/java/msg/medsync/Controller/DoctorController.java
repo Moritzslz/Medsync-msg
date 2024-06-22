@@ -1,27 +1,30 @@
 package msg.medsync.Controller;
 
-import lombok.NoArgsConstructor;
 import msg.medsync.Models.Doctor;
-import msg.medsync.Repositories.DoctorRepository;
-import org.springframework.http.HttpStatus;
+import msg.medsync.Models.Patient;
+import msg.medsync.Repositories.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/v1/doctors/")
+@RestController
+@RequestMapping("/api/v1/doctor")
 public class DoctorController {
 
-    @Autowired
-    public final DoctorRepository doctorRepository;
+    private final DoctorRepository doctorRepository;
 
-    @PostMapping("/create")
-    public HttpStatus createDoctor(@RequestBody Doctor doctor) {
+    public DoctorController(DoctorRepository doctorRepository) {
+        this.doctorRepository = doctorRepository;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> createPatient(@RequestBody Doctor doctor) {
+        // TODO validations
         doctorRepository.save(doctor);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return ResponseEntity.ok().body("Doctor saved");
     }
 
-    @GetMapping("/{id}")
-    GetById(@PathVariable Long id) {
-        return doctorRepository.findById(id).get();
-    }
+    // TODO @GetMapping
+    // TODO @DeleteMapping
+    // TODO @PutMapping
+
 }

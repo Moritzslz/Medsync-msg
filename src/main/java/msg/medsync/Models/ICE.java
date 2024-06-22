@@ -11,12 +11,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "ice")
+@Table(name = "ICE")
 public class ICE {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long iceId;
+    @JoinColumn(name = "patientId", referencedColumnName = "patientId")
+    private Long patientId;
     private String name;
     private String surname;
     private String relationship;
@@ -26,11 +28,9 @@ public class ICE {
     private String houseNumber;
     private String postalCode;
     private String city;
-    @JoinColumn(name = "patientid", referencedColumnName = "patientid")
-    private Long patientId;
 
-    public ICE(Long id, String name, String surname, String relationship, String email, String phone, String street, String houseNumber, String postalCode, String city, Long patientId) {
-        this.id = id;
+    public ICE(Long patientId, String name, String surname, String relationship, String email, String phone, String street, String houseNumber, String postalCode, String city) {
+        this.patientId = patientId;
         this.name = name;
         this.surname = surname;
         this.relationship = relationship;
@@ -40,6 +40,5 @@ public class ICE {
         this.houseNumber = houseNumber;
         this.postalCode = postalCode;
         this.city = city;
-        this.patientId = patientId;
     }
 }

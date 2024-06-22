@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "drugs")
+@Table(name = "drug")
 public class Drug {
 
     @Id
@@ -21,25 +21,24 @@ public class Drug {
     private Long id;
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Long patientId;
+    @OneToOne
+    @JoinColumn(name = "prescribingDoctor", referencedColumnName = "doctorId")
+    private Doctor prescribingDoctor;
     private String name;
     private String dosage;
     private String frequency;
     private Date startDate;
     private Date endDate;
-    @OneToOne
-    @JoinColumn(name = "prescribingDoctor", referencedColumnName = "id")
-    private Doctor prescribingDoctor;
     private String sideEffects;
 
-    public Drug(Long id, Long patientId, String name, String dosage, String frequency, Date startDate, Date endDate, Doctor prescribingDoctor, String sideEffects) {
-        this.id = id;
+    public Drug(Long patientId, Doctor prescribingDoctor, String name, String dosage, String frequency, Date startDate, Date endDate, String sideEffects) {
         this.patientId = patientId;
+        this.prescribingDoctor = prescribingDoctor;
         this.name = name;
         this.dosage = dosage;
         this.frequency = frequency;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.prescribingDoctor = prescribingDoctor;
         this.sideEffects = sideEffects;
     }
 }

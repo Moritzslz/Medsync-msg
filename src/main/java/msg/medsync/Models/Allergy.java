@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "allergies")
+@Table(name = "allergy")
 public class Allergy {
 
     @Id
@@ -23,12 +23,11 @@ public class Allergy {
     private Long patientId;
     private String allergen;
     private String reaction;
-    private String severity;
+    private Severity severity;
     private Date dateDiagnosed;
     private String notes;
 
-    public Allergy(Long id, Long patientId, String allergen, String reaction, String severity, Date dateDiagnosed, String notes) {
-        this.id = id;
+    public Allergy(Long patientId, String allergen, String reaction, Severity severity, Date dateDiagnosed, String notes) {
         this.patientId = patientId;
         this.allergen = allergen;
         this.reaction = reaction;

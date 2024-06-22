@@ -9,3 +9,4 @@ public enum ReportType {
     PROGRESS_NOTE,
     PATHOLOGY_REPORT;
 }
+
