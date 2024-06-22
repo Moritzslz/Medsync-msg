@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +18,6 @@ public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "doctorid")
     private Long doctorId;
     private String name;
     private String surname;
@@ -29,6 +30,9 @@ public class Doctor {
     @Column(name = "postalcode")
     private String postalCode;
     private String city;
+
+    @OneToMany(mappedBy = "doctor")
+    private List<PatientDoctor> patientDoctors;
 
     public Doctor(String name, String surname, String speciality, String email, String phone, String street, String houseNumber, String postalCode, String city) {
         this.name = name;

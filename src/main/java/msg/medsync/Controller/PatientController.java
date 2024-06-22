@@ -23,11 +23,13 @@ public class PatientController {
     private final DrugRepository drugRepository;
     private final ReportRepository reportRepository;
     private final PatientDoctorRepository patientDoctorRepository;
+    private final DoctorRepository doctorRepository;
 
     public PatientController(PatientRepository patientRepository, AllergyRepository allergyRepository,
                              ICERepository iceRepository, VaccinationRepository vaccinationRepository,
                              DiagnosisRepository diagnosisRepository, DrugRepository drugRepository,
-                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository) {
+                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository,
+                             DoctorRepository doctorRepository) {
         this.patientRepository = patientRepository;
         this.allergyRepository = allergyRepository;
         this.iceRepository = iceRepository;
@@ -36,6 +38,7 @@ public class PatientController {
         this.drugRepository = drugRepository;
         this.reportRepository = reportRepository;
         this.patientDoctorRepository = patientDoctorRepository;
+        this.doctorRepository = doctorRepository;
     }
 
      /*
@@ -50,26 +53,32 @@ public class PatientController {
         HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHealthInsuranceProvider());
         patient.setHealthInsuranceProvider(hip.name());
         Patient patientSaved = patientRepository.save(patient);
+
         PatientDoctor patientDoctor = new PatientDoctor();
-        patientDoctor.setPatientId(patientSaved.getPatientId());
-        patientDoctor.setDoctorId(patientSaved.getFamilyDoctor().getDoctorId());
+        patientDoctor.setPatient(patientSaved);
+        patientDoctor.setDoctor(patientSaved.getFamilyDoctor());
         patientDoctor.setPatientName(patientSaved.getName());
         patientDoctor.setPatientSurname(patientSaved.getSurname());
         patientDoctor.setPatientKVR(patientSaved.getKVR());
         patientDoctorRepository.save(patientDoctor);
+
+        ICE ice = patientSaved.getICE();
+        iceRepository.save(ice);
         return ResponseEntity.ok().body(patient);
     }
 
     @PostMapping("{id}/add/doctor/{doctorId}")
     public ResponseEntity<PatientDoctor> addDoctor(@PathVariable Long id, @PathVariable Long doctorId) {
         Optional<Patient> patient = patientRepository.findById(id);
-        if (patient.isEmpty()) {
+        Optional<Doctor> doctor = doctorRepository.findById(doctorId);
+        if (patient.isEmpty() || doctor.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             Patient currentPatient = patient.get();
+            Doctor currentDoctor = doctor.get();
             PatientDoctor patientDoctor = new PatientDoctor();
-            patientDoctor.setPatientId(currentPatient.getPatientId());
-            patientDoctor.setDoctorId(doctorId);
+            patientDoctor.setPatient(currentPatient);
+            patientDoctor.setDoctor(currentDoctor);
             patientDoctor.setPatientName(currentPatient.getName());
             patientDoctor.setPatientSurname(currentPatient.getSurname());
             patientDoctor.setPatientKVR(currentPatient.getKVR());
@@ -102,7 +111,6 @@ public class PatientController {
         existingPatient.setHouseNumber(patient.getHouseNumber());
         existingPatient.setPostalCode(patient.getPostalCode());
         existingPatient.setCity(patient.getCity());
-
 
         patientRepository.save(existingPatient);
         return ResponseEntity.ok().body(existingPatient);
@@ -161,7 +169,11 @@ public class PatientController {
 
     @GetMapping("/{id}/doctors")
     public ResponseEntity<Iterable<PatientDoctor>> getAllDoctors(@PathVariable long id) {
-        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatientId(id);
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatient(patient.get());
         if (!patientDoctorIterable.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {

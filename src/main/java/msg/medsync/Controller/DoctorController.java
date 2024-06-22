@@ -32,7 +32,11 @@ public class DoctorController {
 
     @GetMapping("/{id}/patients")
     public ResponseEntity<Iterable<PatientDoctor>> getAllPatients(@PathVariable long id) {
-        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByDoctorId(id);
+        Optional<Doctor> doctor = doctorRepository.findById(id);
+        if (doctor.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByDoctor(doctor.get());
         if (!patientDoctorIterable.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -43,13 +47,15 @@ public class DoctorController {
     @PostMapping("{id}/add/patient/{patiendId}")
     public ResponseEntity<PatientDoctor> addPatient(@PathVariable Long id, @PathVariable Long patientId) {
         Optional<Patient> patient = patientRepository.findById(patientId);
-        if (patient.isEmpty()) {
+        Optional<Doctor> doctor = doctorRepository.findById(id);
+        if (patient.isEmpty() || doctor.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             Patient currentPatient = patient.get();
+            Doctor currentDoctor = doctor.get();
             PatientDoctor patientDoctor = new PatientDoctor();
-            patientDoctor.setPatientId(currentPatient.getPatientId());
-            patientDoctor.setDoctorId(id);
+            patientDoctor.setPatient(currentPatient);
+            patientDoctor.setDoctor(currentDoctor);
             patientDoctor.setPatientName(currentPatient.getName());
             patientDoctor.setPatientSurname(currentPatient.getSurname());
             patientDoctor.setPatientKVR(currentPatient.getKVR());

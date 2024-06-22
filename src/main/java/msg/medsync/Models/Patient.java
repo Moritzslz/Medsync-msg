@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,6 +46,9 @@ public class Patient {
     @Column(name ="postalcode")
     private String postalCode;
     private String city;
+
+    @OneToMany(mappedBy = "patient")
+    private List<PatientDoctor> patientDoctors;
 
     public Patient(msg.medsync.Models.ICE ICE, Doctor familyDoctor, String KVR, String healthInsuranceProvider, String name, String surname, Date birthday, int weightKg, int heightCm, String email, String phone, String street, String houseNumber, String postalCode, String city) {
         this.ICE = ICE;
