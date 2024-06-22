@@ -49,10 +49,34 @@ public class PatientController {
         // TODO validations
         HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHealthInsuranceProvider());
         patient.setHealthInsuranceProvider(hip.name());
-        patientRepository.save(patient);
+        Patient patientSaved = patientRepository.save(patient);
+        PatientDoctor patientDoctor = new PatientDoctor();
+        patientDoctor.setPatientId(patientSaved.getPatientId());
+        patientDoctor.setDoctorId(patientSaved.getFamilyDoctor().getDoctorId());
+        patientDoctor.setPatientName(patientSaved.getName());
+        patientDoctor.setPatientSurname(patientSaved.getSurname());
+        patientDoctor.setPatientKVR(patientSaved.getKVR());
+        patientDoctorRepository.save(patientDoctor);
         return ResponseEntity.ok().body(patient);
     }
 
+    @PostMapping("{id}/add/doctor/{doctorId}")
+    public ResponseEntity<PatientDoctor> addDoctor(@PathVariable Long id, @PathVariable Long doctorId) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Patient currentPatient = patient.get();
+            PatientDoctor patientDoctor = new PatientDoctor();
+            patientDoctor.setPatientId(currentPatient.getPatientId());
+            patientDoctor.setDoctorId(doctorId);
+            patientDoctor.setPatientName(currentPatient.getName());
+            patientDoctor.setPatientSurname(currentPatient.getSurname());
+            patientDoctor.setPatientKVR(currentPatient.getKVR());
+            patientDoctorRepository.save(patientDoctor);
+            return ResponseEntity.ok().body(patientDoctor);
+        }
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
