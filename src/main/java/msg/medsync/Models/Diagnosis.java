@@ -27,10 +27,10 @@ public class Diagnosis {
     private Doctor issuedBy;
     private String illness;
     private String description;
-    private Severity severity;
+    private String severity;
     private Date dateDiagnosed;
 
-    public Diagnosis(Long patientId, Doctor issuedBy, String illness, String description, Severity severity, Date dateDiagnosed) {
+    public Diagnosis(Long patientId, Doctor issuedBy, String illness, String description, String severity, Date dateDiagnosed) {
         this.patientId = patientId;
         this.issuedBy = issuedBy;
         this.illness = illness;

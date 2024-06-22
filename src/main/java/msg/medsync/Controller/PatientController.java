@@ -329,22 +329,30 @@ public class PatientController {
     */
 
     @PostMapping("/{id}/diagnosis")
-    public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, String severity,  @PathVariable long id) {
+    public ResponseEntity<Diagnosis> addDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id) {
         // TODO validations
         ResponseEntity validated = validateId(id, diagnosis.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
         }
 
-        Severity severityEnum = getSeverity(severity);
-        diagnosis.setSeverity(severityEnum);
+        Severity severity = getSeverity(diagnosis.getSeverity());
+        diagnosis.setSeverity(severity.name());
         diagnosisRepository.save(diagnosis);
         return ResponseEntity.ok().body(diagnosis);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/diagnosis")
+    public ResponseEntity<Iterable<Diagnosis>> getAllDiagnosisById(@PathVariable long id) {
+        Iterable<Diagnosis> diagnoses = diagnosisRepository.findAllByPatientId(id);
+        if (!diagnoses.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(diagnoses);
+        }
+    }
 
-    @DeleteMapping("/{id}/diagnosis/delete")
+    @DeleteMapping("/{id}/diagnosis")
     public ResponseEntity<String> deleteDiagnosis(@PathVariable long id) {
         if(!diagnosisRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -354,9 +362,8 @@ public class PatientController {
         }
     }
 
-
     @PutMapping("/{id}/diagnosis")
-    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id, @RequestParam String severity) {
+    public ResponseEntity<Diagnosis> updateDiagnosis(@RequestBody Diagnosis diagnosis, @PathVariable long id) {
         ResponseEntity validated = validateId(id, diagnosis.getPatientId());
         if (!validated.getStatusCode().equals(HttpStatus.OK)) {
             return validated;
@@ -377,8 +384,8 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        Severity severityEnum = getSeverity(severity);
-        existingDiagnosis.setSeverity(severityEnum);
+        Severity severity = getSeverity(diagnosis.getSeverity());
+        existingDiagnosis.setSeverity(severity.name());
         existingDiagnosis.setDescription(diagnosis.getDescription());
         existingDiagnosis.setIllness(diagnosis.getIllness());
         existingDiagnosis.setIssuedBy(diagnosis.getIssuedBy());
@@ -409,7 +416,15 @@ public class PatientController {
         return ResponseEntity.ok().body(report);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/report")
+    public ResponseEntity<Iterable<Report>> findAllReportsById(@PathVariable long id) {
+        Iterable<Report> reports = reportRepository.findAllByPatientId(id);
+        if (!reports.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(reports);
+        }
+    }
 
     @DeleteMapping("/{id}/report")
     public ResponseEntity<String> deleteReport(@PathVariable long id) {
@@ -441,7 +456,15 @@ public class PatientController {
         return ResponseEntity.ok().body(drug);
     }
 
-    // TODO @GetMapping
+    @GetMapping("/{id}/drug")
+    public ResponseEntity<Iterable<Drug>> getAllDrugsByPatientId(@PathVariable long id) {
+        Iterable<Drug> drugs = drugRepository.findAllByPatientId(id);
+        if (!drugs.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(drugs);
+        }
+    }
 
     @DeleteMapping("/{id}/drug/delete")
     public ResponseEntity<String> deleteDrug(@PathVariable long id) {
