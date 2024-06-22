@@ -2,16 +2,13 @@ package msg.medsync.Controller;
 
 import msg.medsync.Models.*;
 import msg.medsync.Repositories.*;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static msg.medsync.Services.UtilService.getReportType;
-import static msg.medsync.Services.UtilService.getSeverity;
-import static msg.medsync.Services.UtilService.validateId;
+import static msg.medsync.Services.UtilService.*;
 
 @RestController
 @RequestMapping( "/api/v1/patient")
@@ -24,11 +21,12 @@ public class PatientController {
     private final DiagnosisRepository diagnosisRepository;
     private final DrugRepository drugRepository;
     private final ReportRepository reportRepository;
+    private final PatientDoctorRepository patientDoctorRepository;
 
     public PatientController(PatientRepository patientRepository, AllergyRepository allergyRepository,
                              ICERepository iceRepository, VaccinationRepository vaccinationRepository,
                              DiagnosisRepository diagnosisRepository, DrugRepository drugRepository,
-                             ReportRepository reportRepository) {
+                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository) {
         this.patientRepository = patientRepository;
         this.allergyRepository = allergyRepository;
         this.iceRepository = iceRepository;
@@ -36,6 +34,7 @@ public class PatientController {
         this.diagnosisRepository = diagnosisRepository;
         this.drugRepository = drugRepository;
         this.reportRepository = reportRepository;
+        this.patientDoctorRepository = patientDoctorRepository;
     }
 
      /*
@@ -47,6 +46,8 @@ public class PatientController {
     @PostMapping("/register")
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
         // TODO validations
+        HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHealthInsuranceProvider());
+        patient.setHealthInsuranceProvider(hip.name());
         patientRepository.save(patient);
         return ResponseEntity.ok().body(patient);
     }
@@ -91,13 +92,24 @@ public class PatientController {
         }
     }
 
-    @GetMapping("/{kvr}/{healthInsuranceProvider}")
-    public ResponseEntity<Patient> getPatientByKVTAndHealthInsuranceProvider(@PathVariable String kvr, String healthInsuranceProvider) {
-        Optional<Patient> patient = patientRepository.findByKVRAndHealthInsuranceProvider(kvr, healthInsuranceProvider);
+    @GetMapping("/{kvr}/{hip}")
+    public ResponseEntity<Patient> getPatientByKVTAndHIP(@PathVariable String kvr, String hip) {
+        HealthInsuranceProvider HIP = getHealthInsuranceProvider(hip);
+        Optional<Patient> patient = patientRepository.findByKVRAndHealthInsuranceProvider(kvr, HIP.name());
         if (patient.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok().body(patient.get());
+        }
+    }
+
+    @GetMapping("/{id}/doctors")
+    public ResponseEntity<Iterable<PatientDoctor>> getAllDoctors(@PathVariable long id) {
+        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatientId(id);
+        if (!patientDoctorIterable.iterator().hasNext()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(patientDoctorIterable);
         }
     }
 
