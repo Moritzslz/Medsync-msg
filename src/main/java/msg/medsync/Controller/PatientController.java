@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static msg.medsync.Services.UtilService.getReportType;
-import static msg.medsync.Services.UtilService.getSeverity;
-import static msg.medsync.Services.UtilService.validateId;
+import static msg.medsync.Services.UtilService.*;
 
 @RestController
 @RequestMapping( "/api/v1/patient")
@@ -24,11 +22,12 @@ public class PatientController {
     private final DiagnosisRepository diagnosisRepository;
     private final DrugRepository drugRepository;
     private final ReportRepository reportRepository;
+    private final PatientDoctorRepository patientDoctorRepository;
 
     public PatientController(PatientRepository patientRepository, AllergyRepository allergyRepository,
                              ICERepository iceRepository, VaccinationRepository vaccinationRepository,
                              DiagnosisRepository diagnosisRepository, DrugRepository drugRepository,
-                             ReportRepository reportRepository) {
+                             ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository) {
         this.patientRepository = patientRepository;
         this.allergyRepository = allergyRepository;
         this.iceRepository = iceRepository;
@@ -36,6 +35,7 @@ public class PatientController {
         this.diagnosisRepository = diagnosisRepository;
         this.drugRepository = drugRepository;
         this.reportRepository = reportRepository;
+        this.patientDoctorRepository = patientDoctorRepository;
     }
 
      /*
@@ -47,6 +47,8 @@ public class PatientController {
     @PostMapping("/register")
     public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
         // TODO validations
+        HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHealthInsuranceProvider());
+        patient.setHealthInsuranceProvider(hip.name());
         patientRepository.save(patient);
         return ResponseEntity.ok().body(patient);
     }
@@ -91,9 +93,10 @@ public class PatientController {
         }
     }
 
-    @GetMapping("/{kvr}/{healthInsuranceProvider}")
-    public ResponseEntity<Patient> getPatientByKVTAndHealthInsuranceProvider(@PathVariable String kvr, String healthInsuranceProvider) {
-        Optional<Patient> patient = patientRepository.findByKVRAndHealthInsuranceProvider(kvr, healthInsuranceProvider);
+    @GetMapping("/{kvr}/{hip}")
+    public ResponseEntity<Patient> getPatientByKVTAndHIP(@PathVariable String kvr, String hip) {
+        HealthInsuranceProvider HIP = getHealthInsuranceProvider(hip);
+        Optional<Patient> patient = patientRepository.findByKVRAndHealthInsuranceProvider(kvr, HIP.name());
         if (patient.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -101,17 +104,15 @@ public class PatientController {
         }
     }
 
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deletePatient(@PathVariable long id) {
-        if(!patientRepository.existsById(id)) {
+    @GetMapping("/{id}/doctors")
+    public ResponseEntity<Iterable<PatientDoctor>> getAllDoctors(@PathVariable long id) {
+        Iterable<PatientDoctor> patientDoctorIterable = patientDoctorRepository.findAllByPatientId(id);
+        if (!patientDoctorIterable.iterator().hasNext()) {
             return ResponseEntity.notFound().build();
         } else {
-            patientRepository.deleteById(id);
-            return ResponseEntity.ok().body("Patient deleted");
+            return ResponseEntity.ok().body(patientDoctorIterable);
         }
     }
-
-
 
     /*
     ============================================================================
@@ -183,7 +184,7 @@ public class PatientController {
         }
     }
 
-    @DeleteMapping("/{id}/allergy/delete")
+    @DeleteMapping("/{id}/allergy")
     public ResponseEntity<String> deleteAllergy(@PathVariable long id) {
         if(!allergyRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -214,8 +215,8 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    
-    @DeleteMapping("/{id}/vaccination/delete/")
+
+    @DeleteMapping("/{id}/vaccination/")
     public ResponseEntity<String> deleteVaccination(@PathVariable long id) {
         if(!vaccinationRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -249,7 +250,7 @@ public class PatientController {
     }
 
     // TODO @GetMapping
-    
+
     @DeleteMapping("/{id}/diagnosis/delete")
     public ResponseEntity<String> deleteDiagnosis(@PathVariable long id) {
         if(!diagnosisRepository.existsById(id)) {
@@ -286,8 +287,8 @@ public class PatientController {
 
     // TODO @GetMapping
 
-    @DeleteMapping("/{id}/report/delete")
-    public ResponseRepository<String> deleteReport(@PathVariable long id) {
+    @DeleteMapping("/{id}/report")
+    public ResponseEntity<String> deleteReport(@PathVariable long id) {
         if(!reportRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         } else {
