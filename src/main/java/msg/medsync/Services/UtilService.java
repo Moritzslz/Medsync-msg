@@ -19,13 +19,13 @@ public class UtilService {
 
     public static ReportType getReportType(String type) {
         return switch (type.toLowerCase().trim()) {
-            case "lab_results" -> ReportType.LAB_RESULTS;
-            case "radiology_report" -> ReportType.RADIOLOGY_REPORT;
-            case "consultation_note" -> ReportType.CONSULTATION_NOTE;
-            case "surgical_report" -> ReportType.SURGICAL_REPORT;
-            case "discharge_summary" -> ReportType.DISCHARGE_SUMMARY;
-            case "progress_note" -> ReportType.PROGRESS_NOTE;
-            case "pathology_report" -> ReportType.PATHOLOGY_REPORT;
+            case "lab results" -> ReportType.LAB_RESULTS;
+            case "radiology report" -> ReportType.RADIOLOGY_REPORT;
+            case "consultation note" -> ReportType.CONSULTATION_NOTE;
+            case "surgical report" -> ReportType.SURGICAL_REPORT;
+            case "discharge summary" -> ReportType.DISCHARGE_SUMMARY;
+            case "progress note" -> ReportType.PROGRESS_NOTE;
+            case "pathology report" -> ReportType.PATHOLOGY_REPORT;
             default -> throw new IllegalArgumentException("Unknown report type: " + type);
         };
     }
