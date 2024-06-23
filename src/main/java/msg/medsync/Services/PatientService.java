@@ -75,8 +75,7 @@ public class PatientService {
         return patientDoctorRepository.save(patientDoctor);
     }
 
-    public HealthInsuranceProvider getHealthInsuranceProvider(Patient patient) {
-        String hip = patient.getHip();
+    public HealthInsuranceProvider getHealthInsuranceProvider(String  hip) {
         return switch (hip.toLowerCase().trim()) {
             case "aok" -> HealthInsuranceProvider.AOK;
             case "tk" -> HealthInsuranceProvider.TK;
