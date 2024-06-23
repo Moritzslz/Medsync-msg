@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "patient")
-@JsonIgnoreProperties({"patients"})
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
