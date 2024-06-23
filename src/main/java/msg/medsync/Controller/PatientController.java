@@ -3,9 +3,9 @@ package msg.medsync.Controller;
 import msg.medsync.Models.*;
 import msg.medsync.Models.Enums.Allergen;
 import msg.medsync.Models.Enums.HealthInsuranceProvider;
-import msg.medsync.Models.Enums.ReportType;
 import msg.medsync.Models.Enums.Severity;
 import msg.medsync.Repositories.*;
+import msg.medsync.Services.PatientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static msg.medsync.Services.UtilService.*;
 
 @RestController
 @RequestMapping( "/api/v1/patient")
@@ -24,16 +23,17 @@ public class PatientController {
     private final ICERepository iceRepository;
     private final VaccinationRepository vaccinationRepository;
     private final DiagnosisRepository diagnosisRepository;
-    private final DrugRepository drugRepository;
+    private final DrugController drugRepository;
     private final ReportRepository reportRepository;
     private final PatientDoctorRepository patientDoctorRepository;
     private final DoctorRepository doctorRepository;
+    private final PatientService patientService;
 
     public PatientController(PatientRepository patientRepository, AllergyRepository allergyRepository,
                              ICERepository iceRepository, VaccinationRepository vaccinationRepository,
-                             DiagnosisRepository diagnosisRepository, DrugRepository drugRepository,
+                             DiagnosisRepository diagnosisRepository, DrugController drugRepository,
                              ReportRepository reportRepository, PatientDoctorRepository patientDoctorRepository,
-                             DoctorRepository doctorRepository) {
+                             DoctorRepository doctorRepository, PatientService patientService) {
         this.patientRepository = patientRepository;
         this.allergyRepository = allergyRepository;
         this.iceRepository = iceRepository;
@@ -43,6 +43,7 @@ public class PatientController {
         this.reportRepository = reportRepository;
         this.patientDoctorRepository = patientDoctorRepository;
         this.doctorRepository = doctorRepository;
+        this.patientService = patientService;
     }
 
      /*
@@ -52,24 +53,30 @@ public class PatientController {
     */
 
     @PostMapping("/register")
-    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
-        // TODO validations
-        HealthInsuranceProvider hip = getHealthInsuranceProvider(patient.getHip());
+    public ResponseEntity<Object> createPatient(@RequestBody Patient patient) {
+
+        ResponseEntity<String> validated = patientService.validatePatient(patient);
+        if (!validated.getStatusCode().equals(HttpStatus.OK)) {
+            return ResponseEntity.status(validated.getStatusCode()).body(validated.getBody());
+        }
+
+        HealthInsuranceProvider hip = patientService.getHealthInsuranceProvider(patient);
         patient.setHip(hip.name());
 
-        Patient patientSaved = patientRepository.save(patient);
+        ICE ice = patient.getIce();
+        if (ice != null) {
+            ice.setPatient(patient);
+            iceRepository.save(ice);
+        } else {
+            ICE nIce = patientService.createNewICE(patient);
+            patient.setIce(nIce);
+        }
 
-        PatientDoctor patientDoctor = new PatientDoctor();
-        patientDoctor.setPatient(patientSaved);
-        patientDoctor.setDoctor(patientSaved.getFamilyDoctor());
-        patientDoctor.setPatientName(patientSaved.getName());
-        patientDoctor.setPatientSurname(patientSaved.getSurname());
-        patientDoctor.setPatientKvr(patientSaved.getKvr());
-        patientDoctorRepository.save(patientDoctor);
+        Patient savedPatient = patientRepository.save(patient);
 
-        ICE ice = patientSaved.getIce();
-        iceRepository.save(ice);
-        return ResponseEntity.ok().body(patientSaved);
+        patientService.mapToAndSavePatientDoctor(patient);
+
+        return ResponseEntity.ok().body(savedPatient);
     }
 
     @PostMapping("{id}/add/doctor/{doctorId}")
@@ -79,15 +86,7 @@ public class PatientController {
         if (patient.isEmpty() || doctor.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            Patient currentPatient = patient.get();
-            Doctor currentDoctor = doctor.get();
-            PatientDoctor patientDoctor = new PatientDoctor();
-            patientDoctor.setPatient(currentPatient);
-            patientDoctor.setDoctor(currentDoctor);
-            patientDoctor.setPatientName(currentPatient.getName());
-            patientDoctor.setPatientSurname(currentPatient.getSurname());
-            patientDoctor.setPatientKvr(currentPatient.getKvr());
-            patientDoctorRepository.save(patientDoctor);
+            PatientDoctor patientDoctor = patientService.mapToAndSavePatientDoctor(patient.get());
             return ResponseEntity.ok().body(patientDoctor);
         }
     }
@@ -134,7 +133,7 @@ public class PatientController {
 
     @GetMapping("kvr/{kvr}/{hip}")
     public ResponseEntity<Patient> getPatientByKVTAndHIP(@PathVariable String kvr, @PathVariable String hip) {
-        HealthInsuranceProvider HIP = getHealthInsuranceProvider(hip);
+        HealthInsuranceProvider HIP = patientService.getHealthInsuranceProvider(hip);
         Optional<Patient> patient = patientRepository.findByKvrAndHip(kvr, HIP.name());
         if (patient.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -585,7 +584,7 @@ public class PatientController {
 
     @PostMapping("/{id}/report")
     public ResponseEntity<Report> addReport(@RequestBody Report report, @PathVariable long id) {
-        // TODO validations
+
         Optional<Patient> patient = patientRepository.findById(id);
         if (patient.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
